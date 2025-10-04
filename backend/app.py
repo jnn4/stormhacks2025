@@ -4,6 +4,7 @@ from config import config
 from models import db, User, Post
 import os
 from dotenv import load_dotenv
+from auth import auth_bp
 
 load_dotenv()
 app = Flask(__name__)
@@ -51,6 +52,8 @@ def create_app(config_name='default'):
     @app.route('/health')
     def health():
         return jsonify({'status': 'healthy'}), 200
+
+    app.register_blueprint(auth_bp)
     
 
     @app.route('/chat', methods=['GET', 'POST'])
