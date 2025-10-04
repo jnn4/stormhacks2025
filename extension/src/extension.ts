@@ -29,6 +29,75 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.commands.executeCommand('stormhacks.stormhacksView.focus');
 		})
 	);
+
+	// Register the quiz command to open quiz in a new tab
+	context.subscriptions.push(
+		vscode.commands.registerCommand('stormhacks.openQuiz', () => {
+			openQuizPanel(context.extensionUri);
+		})
+	);
+}
+
+function openQuizPanel(extensionUri: vscode.Uri) {
+	// Create and show a new webview panel
+	const panel = vscode.window.createWebviewPanel(
+		'stormhacksQuiz', // Identifies the type of the webview
+		'Vim Quiz', // Title of the panel displayed to the user
+		vscode.ViewColumn.One, // Editor column to show the new webview panel in
+		{
+			enableScripts: true,
+			localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'dist')]
+		}
+	);
+
+	// Set the webview's HTML content
+	panel.webview.html = getQuizWebviewContent(panel.webview, extensionUri);
+}
+
+function getQuizWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri): string {
+	// Get the local path to the quiz script
+	const scriptUri = webview.asWebviewUri(
+		vscode.Uri.joinPath(extensionUri, 'dist', 'quiz.js')
+	);
+
+	// Use a nonce to only allow specific scripts to be run
+	const nonce = getNonce();
+
+	return `<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; img-src ${webview.cspSource} https:; script-src 'nonce-${nonce}'; font-src ${webview.cspSource};">
+	<title>Vim Quiz</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			overflow-x: hidden;
+			overflow-y: auto;
+		}
+		#root {
+			width: 100%;
+			min-height: 100vh;
+		}
+	</style>
+</head>
+<body>
+	<div id="root"></div>
+	<script nonce="${nonce}">
+		// Error handling
+		window.addEventListener('error', (e) => {
+			console.error('Webview error:', e.message, e.filename, e.lineno, e.colno);
+		});
+		console.log('Quiz webview initializing...');
+	</script>
+	<script nonce="${nonce}" src="${scriptUri}"></script>
+	<script nonce="${nonce}">
+		console.log('Quiz webview script loaded');
+	</script>
+</body>
+</html>`;
 }
 
 class StormhacksViewProvider implements vscode.WebviewViewProvider {
@@ -63,7 +132,7 @@ class StormhacksViewProvider implements vscode.WebviewViewProvider {
 	private _getWebviewContent(webview: vscode.Webview): string {
 		// Get the local path to the webview script
 		const scriptUri = webview.asWebviewUri(
-			vscode.Uri.joinPath(this._extensionUri, 'dist', 'webview.js')
+			vscode.Uri.joinPath(this._extensionUri, 'dist', 'sidebar.js')
 		);
 
 		// Use a nonce to only allow specific scripts to be run

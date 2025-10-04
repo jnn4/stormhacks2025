@@ -47,15 +47,14 @@ const extensionConfig = {
   },
 };
 
-/** @type WebpackConfig */
-const webviewConfig = {
-  target: 'web', // webview runs in a web context
+// Shared webview configuration
+const createWebviewConfig = (entryFile, outputFile) => ({
+  target: 'web',
   mode: 'none',
-  
-  entry: './src/webview/index.tsx',
+  entry: `./src/webview/entries/${entryFile}`,
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'webview.js',
+    filename: outputFile,
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
@@ -97,6 +96,10 @@ const webviewConfig = {
   infrastructureLogging: {
     level: "log",
   },
-};
+});
 
-module.exports = [ extensionConfig, webviewConfig ];
+// Create webview configurations
+const sidebarWebviewConfig = createWebviewConfig('sidebar.tsx', 'sidebar.js');
+const quizWebviewConfig = createWebviewConfig('quiz.tsx', 'quiz.js');
+
+module.exports = [ extensionConfig, sidebarWebviewConfig, quizWebviewConfig ];
