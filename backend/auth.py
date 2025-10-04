@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, redirect, url_for, request, Blueprint
+from flask import jsonify, redirect, request, Blueprint, current_app
 from auth_utils import generate_jwt_token, token_required, token_optional
 import requests
 import secrets
@@ -7,11 +7,12 @@ import secrets
 oauth_states = {}
 
 auth_bp = Blueprint("auth", __name__)
+
 @auth_bp.route('/auth/github')
 def auth_github():
     """Initiate GitHub OAuth flow"""
     # Check if GitHub OAuth is configured
-    if not app.config['GITHUB_CLIENT_ID'] or not app.config['GITHUB_CLIENT_SECRET']:
+    if not current_app.config['GITHUB_CLIENT_ID'] or not current_app.config['GITHUB_CLIENT_SECRET']:
         return jsonify({
             'error': 'GitHub OAuth not configured',
             'message': 'Please set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET in .env'
@@ -24,8 +25,8 @@ def auth_github():
     # Build GitHub authorization URL
     github_auth_url = 'https://github.com/login/oauth/authorize'
     params = {
-        'client_id': app.config['GITHUB_CLIENT_ID'],
-        'redirect_uri': app.config['GITHUB_REDIRECT_URI'],
+        'client_id': current_app.config['GITHUB_CLIENT_ID'],
+        'redirect_uri': current_app.config['GITHUB_REDIRECT_URI'],
         'scope': 'user user:email',  # 'user' scope includes email access
         'state': state
     }
@@ -68,10 +69,10 @@ def auth_github_callback():
     # Exchange code for access token
     token_url = 'https://github.com/login/oauth/access_token'
     token_data = {
-        'client_id': app.config['GITHUB_CLIENT_ID'],
-        'client_secret': app.config['GITHUB_CLIENT_SECRET'],
+        'client_id': current_app.config['GITHUB_CLIENT_ID'],
+        'client_secret': current_app.config['GITHUB_CLIENT_SECRET'],
         'code': code,
-        'redirect_uri': app.config['GITHUB_REDIRECT_URI']
+        'redirect_uri': current_app.config['GITHUB_REDIRECT_URI']
     }
     token_headers = {
         'Accept': 'application/json'
