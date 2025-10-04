@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
 
-const App: React.FC = () => {
+const SidebarApp: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    console.log('App component mounted!');
+    console.log('SidebarApp component mounted!');
   }, []);
 
   return (
@@ -148,5 +147,5 @@ const CommandCard: React.FC<CommandCardProps> = ({ title, commands }) => {
   );
 };
 
-export default App;
+export default SidebarApp;
 
