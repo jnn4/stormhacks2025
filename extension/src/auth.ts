@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as http from 'http';
+import * as https from 'https';
 import * as url from 'url';
 import * as crypto from 'crypto';
 
@@ -176,32 +177,79 @@ export class AuthManager {
             throw new Error('Not authenticated');
         }
         
-        const options: RequestInit = {
-            method,
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+        return new Promise((resolve, reject) => {
+            const urlObj = new URL(`${BACKEND_URL}${endpoint}`);
+            const isHttps = urlObj.protocol === 'https:';
+            const httpModule = isHttps ? https : http;
+            
+            const postData = body ? JSON.stringify(body) : undefined;
+            
+            const options = {
+                hostname: urlObj.hostname,
+                port: urlObj.port || (isHttps ? 443 : 80),
+                path: urlObj.pathname + urlObj.search,
+                method: method,
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    ...(postData && { 'Content-Length': Buffer.byteLength(postData) })
+                }
+            };
+            
+            const req = httpModule.request(options, (res) => {
+                let data = '';
+                
+                res.on('data', (chunk) => {
+                    data += chunk;
+                });
+                
+                res.on('end', () => {
+                    console.log(`HTTP Response [${method} ${endpoint}]:`, {
+                        statusCode: res.statusCode,
+                        statusMessage: res.statusMessage,
+                        body: data
+                    });
+                    
+                    if (res.statusCode === 401) {
+                        // Token expired or invalid
+                        this.clearToken();
+                        reject(new Error('Authentication expired. Please login again.'));
+                        return;
+                    }
+                    
+                    if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
+                        try {
+                            const error = JSON.parse(data);
+                            const errorMsg = error.error || error.message || `Request failed: ${res.statusMessage}`;
+                            console.error('Request error:', errorMsg, 'Full error:', error);
+                            reject(new Error(errorMsg));
+                        } catch (e) {
+                            console.error('Failed to parse error response:', data);
+                            reject(new Error(`Request failed: ${res.statusMessage || 'Unknown error'}`));
+                        }
+                        return;
+                    }
+                    
+                    try {
+                        const result = JSON.parse(data);
+                        resolve(result);
+                    } catch (e) {
+                        console.error('Failed to parse success response:', data);
+                        reject(new Error('Failed to parse response'));
+                    }
+                });
+            });
+            
+            req.on('error', (error) => {
+                reject(error);
+            });
+            
+            if (postData) {
+                req.write(postData);
             }
-        };
-        
-        if (body) {
-            options.body = JSON.stringify(body);
-        }
-        
-        const response = await fetch(`${BACKEND_URL}${endpoint}`, options);
-        
-        if (response.status === 401) {
-            // Token expired or invalid
-            await this.clearToken();
-            throw new Error('Authentication expired. Please login again.');
-        }
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || `Request failed: ${response.statusText}`);
-        }
-        
-        return response.json();
+            
+            req.end();
+        });
     }
 
     public async getCurrentUser(): Promise<any> {
