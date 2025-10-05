@@ -37,3 +37,25 @@ declare const vscode: VsCodeApi;
  */
 declare function acquireVsCodeApi(): VsCodeApi;
 
+/**
+ * Media URIs that are passed from the extension to the webview
+ * These are properly formatted webview URIs for accessing assets
+ */
+interface MediaUris {
+  // Images
+  bgSudo?: string;
+  calendarIcon?: string;
+  catHouse?: string;
+  catTree?: string;
+  cat?: string;
+  foodBowl?: string;
+  postureIcon?: string;
+  tutorIcon?: string;
+}
+
+/**
+ * Extend the Window interface to include media URIs
+ */
+interface Window {
+  __MEDIA_URIS__?: MediaUris;
+}
