@@ -13,7 +13,6 @@ const SidebarApp: React.FC = () => {
   //Change to BuddyApp
   function handleBuddy() {
     setAppState(1);
-    console.log("buddy clicked");
   }
 
   //Change to Terminal App

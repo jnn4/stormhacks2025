@@ -1,5 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
+// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import path from "path";
 import { AuthManager } from './auth';
 import { ActivityTracker } from './activity-tracker';
 
@@ -154,7 +156,7 @@ function getManPage(webview: vscode.Webview, extensionUri: vscode.Uri): string {
 </body>
 </html>`;
 }
-    
+
 function openQuizPanel(extensionUri: vscode.Uri) {
     // Create and show a new webview panel
     const panel = vscode.window.createWebviewPanel(
