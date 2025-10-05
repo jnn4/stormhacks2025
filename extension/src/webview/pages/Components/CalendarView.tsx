@@ -42,7 +42,7 @@ function CalendarView() {
 
   return (
     <>
-      <div className="flex flex-col items-center mx-auto mt-10 w-11/12 max-w-3xl h-[30vh] m-3 bg-white rounded-lg border border-yellow-950 shadow-md">
+      <div className="flex flex-wrap flex-col items-center mx-auto mt-10 w-11/12 max-w-3xl m-3 bg-white rounded-lg border border-yellow-950 shadow-md">
         <h1 className="font-sans font-bold text-lg text-gray-800">
           {currentMonth}
         </h1>
@@ -57,6 +57,22 @@ function CalendarView() {
               day={item.day}
             ></CalendarCardView>
           ))}
+        </div>
+        <div className="flex items-stretch p-5">
+          <div className="relative w-5 h-5 bg-gray-500"></div>;
+          <p className="font-sans font-normal text-sm text-gray-800">
+            Not Available
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center pb-5">
+          <div className="relative w-5 h-5 bg-blue-200"></div>
+          <div className="relative w-5 h-5 bg-blue-300"></div>
+          <div className="relative w-5 h-5 bg-blue-400"></div>
+          <div className="relative w-5 h-5 bg-blue-500"></div>
+          <p className="font-sans font-normal text-sm text-gray-800">
+            Less - More Frequent
+          </p>
         </div>
       </div>
     </>
