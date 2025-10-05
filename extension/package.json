@@ -20,6 +20,22 @@
       {
         "command": "stormhacks.openQuiz",
         "title": "Open Vim Quiz"
+      },
+      {
+        "command": "stormhacks.login",
+        "title": "Stormhacks: Login with GitHub"
+      },
+      {
+        "command": "stormhacks.logout",
+        "title": "Stormhacks: Logout"
+      },
+      {
+        "command": "stormhacks.checkAuth",
+        "title": "Stormhacks: Check Authentication Status"
+      },
+      {
+        "command": "stormhacks.toggleLogSession",
+        "title": "Stormhacks: Toggle Activity Logging"
       }
     ],
     "views": {
@@ -45,6 +61,7 @@
   },
   "dependencies": {
     "lucide-react": "^0.544.0",
+    "polka": "^0.5.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -53,7 +70,7 @@
     "@types/node": "22.x",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
-    "@types/vscode": "^1.75.0",
+    "@types/vscode": "^1.104.0",
     "@typescript-eslint/eslint-plugin": "^8.45.0",
     "@typescript-eslint/parser": "^8.45.0",
     "@vscode/test-cli": "^0.0.11",
@@ -67,6 +84,7 @@
     "style-loader": "^3.3.3",
     "tailwindcss": "^3.3.5",
     "ts-loader": "^9.5.4",
+    "tslib": "^2.7.1",
     "typescript": "^5.9.3",
     "webpack": "^5.102.0",
     "webpack-cli": "^6.0.1"
