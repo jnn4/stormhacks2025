@@ -276,6 +276,7 @@ export class ActivityTracker {
         
         // PRIORITY 1: Check our extension mapping FIRST for known file types
         // This ensures .cc files always map to 'cpp' even if VS Code detects them as 'plaintext'
+        vscode.window.showInformationMessage(`Extension is ${extension} and extensionToLanguage is ${extensionToLanguage}`);
         if (extension && extensionToLanguage[extension]) {
             this.log(`Mapped extension .${extension} to language: ${extensionToLanguage[extension]}`);
             return extensionToLanguage[extension];

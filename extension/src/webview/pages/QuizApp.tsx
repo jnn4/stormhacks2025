@@ -38,11 +38,11 @@ function QuizApp(): JSX.Element {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#C7E0FE] to-[#FFF4DF] p-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">Code Quiz</h1>
-          <p className="text-gray-600">Choose a quiz type to test your skills</p>
+          <h1 className="text-4xl font-bold text-[#272123] mb-4">Code Quiz</h1>
+          <p className="text-[#688A9F]">Choose a quiz type to test your skills</p>
         </div>
         
         <div className="grid md:grid-cols-3 gap-6">
@@ -77,13 +77,13 @@ function QuizTypeCard({ title, icon, description, color, onClick }: QuizTypeCard
   return (
     <button
       onClick={onClick}
-      className="bg-white rounded-lg p-8 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
+      className="bg-[#FFF4DF] rounded-lg p-8 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
     >
       <div className={`${color} text-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4`}>
         {icon}
       </div>
-      <h3 className="text-xl font-bold text-gray-800 mb-2">{title}</h3>
-      <p className="text-gray-600">{description}</p>
+      <h3 className="text-xl font-bold text-[#272123] mb-2">{title}</h3>
+      <p className="text-[#688A9F]">{description}</p>
     </button>
   );
 }
@@ -215,16 +215,16 @@ function Quiz({ quizType, onBack }: QuizProps): JSX.Element {
     const percentage = Math.round((score / total) * 100);
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+      <div className="min-h-screen bg-gradient-to-br from-[#C7E0FE] to-[#FFF4DF] p-8">
         <div className="max-w-3xl mx-auto">
-          <div className="bg-white rounded-lg shadow-xl p-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Quiz Results</h2>
+          <div className="bg-[#FFF4DF] rounded-lg shadow-xl p-8">
+            <h2 className="text-3xl font-bold text-[#272123] mb-6 text-center">Quiz Results</h2>
             
             <div className="text-center mb-8">
               <div className={`text-6xl font-bold mb-2 ${percentage >= 70 ? 'text-green-500' : percentage >= 50 ? 'text-yellow-500' : 'text-red-500'}`}>
                 {percentage}%
               </div>
-              <p className="text-xl text-gray-600">
+              <p className="text-xl text-[#688A9F]">
                 {score} out of {total} correct
               </p>
             </div>
@@ -235,13 +235,13 @@ function Quiz({ quizType, onBack }: QuizProps): JSX.Element {
                 const isCorrect = userAnswer === q.answer;
                 
                 return (
-                  <div key={q.id} className={`p-4 rounded-lg border-2 ${isCorrect ? 'border-green-300 bg-green-50' : 'border-red-300 bg-red-50'}`}>
-                    <p className="font-semibold text-gray-800 mb-2">{q.question}</p>
-                    <p className="text-sm text-gray-600 mb-2">Code: {q.boilerplate}</p>
+                  <div key={q.id} className={`p-4 rounded-lg border-2 ${isCorrect ? 'border-green-400 bg-green-50' : 'border-red-400 bg-red-50'}`}>
+                    <p className="font-semibold text-[#272123] mb-2">{q.question}</p>
+                    <p className="text-sm text-[#688A9F] mb-2">Code: {q.boilerplate}</p>
                     <div className="flex items-center gap-4">
-                      <span className="text-sm">Your answer: <code className="bg-gray-200 px-2 py-1 rounded">{userAnswer || '(empty)'}</code></span>
+                      <span className="text-sm text-[#272123]">Your answer: <code className="bg-[#C7E0FE] px-2 py-1 rounded">{userAnswer || '(empty)'}</code></span>
                       {!isCorrect && (
-                        <span className="text-sm">Correct: <code className="bg-green-200 px-2 py-1 rounded">{q.answer}</code></span>
+                        <span className="text-sm text-[#272123]">Correct: <code className="bg-green-200 px-2 py-1 rounded">{q.answer}</code></span>
                       )}
                     </div>
                   </div>
@@ -252,7 +252,7 @@ function Quiz({ quizType, onBack }: QuizProps): JSX.Element {
             <div className="flex gap-4">
               <button
                 onClick={onBack}
-                className="flex-1 bg-gray-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-gray-600 transition-colors"
+                className="flex-1 bg-[#688A9F] text-white py-3 px-6 rounded-lg font-semibold hover:bg-[#5a7a8e] transition-colors"
               >
                 Back to Quiz Selection
               </button>
@@ -262,7 +262,7 @@ function Quiz({ quizType, onBack }: QuizProps): JSX.Element {
                   setUserAnswers({});
                   setShowResults(false);
                 }}
-                className="flex-1 bg-blue-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-600 transition-colors"
+                className="flex-1 bg-[#688A9F] text-white py-3 px-6 rounded-lg font-semibold hover:bg-[#5a7a8e] transition-colors"
               >
                 Retry Quiz
               </button>
@@ -274,55 +274,55 @@ function Quiz({ quizType, onBack }: QuizProps): JSX.Element {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#C7E0FE] to-[#FFF4DF] p-8">
       <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-lg shadow-xl p-8">
+        <div className="bg-[#FFF4DF] rounded-lg shadow-xl p-8">
           <div className="flex justify-between items-center mb-6">
             <button
               onClick={onBack}
-              className="text-gray-600 hover:text-gray-800 font-semibold"
+              className="text-[#688A9F] hover:text-[#272123] font-semibold"
             >
               ← Back
             </button>
-            <h2 className="text-2xl font-bold text-gray-800">{quiz.title}</h2>
-            <span className="text-gray-600 font-semibold">
+            <h2 className="text-2xl font-bold text-[#272123]">{quiz.title}</h2>
+            <span className="text-[#688A9F] font-semibold">
               {currentQuestion + 1} / {quiz.questions.length}
             </span>
           </div>
 
           <div className="mb-8">
-            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div className="h-2 bg-[#C7E0FE] rounded-full overflow-hidden">
               <div
-                className="h-full bg-blue-500 transition-all duration-300"
+                className="h-full bg-[#688A9F] transition-all duration-300"
                 style={{ width: `${((currentQuestion + 1) / quiz.questions.length) * 100}%` }}
               />
             </div>
           </div>
 
           <div className="mb-8">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">
+            <h3 className="text-xl font-semibold text-[#272123] mb-4">
               {question.question}
             </h3>
             
-            <div className="bg-gray-900 text-green-400 p-6 rounded-lg font-mono text-lg mb-4">
+            <div className="bg-[#272123] text-[#C7E0FE] p-6 rounded-lg font-mono text-lg mb-4">
               {question.boilerplate}
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-[#272123] mb-2">
                 Your Answer:
               </label>
               <input
                 type="text"
                 value={userAnswers[question.id] || ''}
                 onChange={handleAnswerChange}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none font-mono text-lg"
+                className="w-full px-4 py-3 border-2 border-[#C7E0FE] rounded-lg focus:border-[#688A9F] focus:outline-none font-mono text-lg text-[#272123] bg-white"
                 placeholder="Fill in the blank..."
               />
             </div>
 
-            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
-              <p className="text-sm text-gray-700">
+            <div className="bg-[#C7E0FE] border-l-4 border-[#688A9F] p-4 rounded">
+              <p className="text-sm text-[#272123]">
                 <span className="font-semibold">Hint:</span> {question.hint}
               </p>
             </div>
@@ -332,13 +332,13 @@ function Quiz({ quizType, onBack }: QuizProps): JSX.Element {
             <button
               onClick={handlePrevious}
               disabled={currentQuestion === 0}
-              className="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-3 bg-[#C7E0FE] text-[#272123] rounded-lg font-semibold hover:bg-[#b5d0ed] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Previous
             </button>
             <button
               onClick={handleNext}
-              className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors"
+              className="flex-1 px-6 py-3 bg-[#688A9F] text-white rounded-lg font-semibold hover:bg-[#5a7a8e] transition-colors"
             >
               {currentQuestion === quiz.questions.length - 1 ? 'Submit Quiz' : 'Next Question'}
             </button>
