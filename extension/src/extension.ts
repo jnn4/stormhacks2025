@@ -96,7 +96,7 @@ function openQuizPanel(extensionUri: vscode.Uri) {
     // Create and show a new webview panel
     const panel = vscode.window.createWebviewPanel(
         'stormhacksQuiz', // Identifies the type of the webview
-        'Vim Quiz', // Title of the panel displayed to the user
+        'Terminal Quiz', // Title of the panel displayed to the user
         vscode.ViewColumn.One, // Editor column to show the new webview panel in
         {
             enableScripts: true,
@@ -114,6 +114,9 @@ function getQuizWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri
         vscode.Uri.joinPath(extensionUri, 'dist', 'quiz.js')
     );
 
+    const bg_winterUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(extensionUri, 'dist', 'media', 'bg_winter.png')
+    );
     // Use a nonce to only allow specific scripts to be run
     const nonce = getNonce();
 
@@ -123,7 +126,7 @@ function getQuizWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; img-src ${webview.cspSource} https:; script-src 'nonce-${nonce}'; font-src ${webview.cspSource}; connect-src http://localhost:5000 http://127.0.0.1:5000 https://api.github.com;">
-    <title>Vim Quiz</title>
+    <title>Tilda Teaching</title>
     <style>
         body {
             margin: 0;
@@ -148,6 +151,10 @@ function getQuizWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri
             console.error('Webview error:', e.message, e.filename, e.lineno, e.colno);
         });
         console.log('Quiz webview initializing...');
+        // Make media URIs available to React
+        window.__MEDIA_URIS__ = {
+            bg_winter: '${bg_winterUri}'
+        };
     </script>
     <script nonce="${nonce}" src="${scriptUri}"></script>
     <script nonce="${nonce}">

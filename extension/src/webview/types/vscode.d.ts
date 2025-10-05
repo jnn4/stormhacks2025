@@ -43,6 +43,7 @@ declare function acquireVsCodeApi(): VsCodeApi;
  */
 interface MediaUris {
   screenshot?: string;
+  bg_winter?: string;
   // Add more media file URIs here as needed
 }
 

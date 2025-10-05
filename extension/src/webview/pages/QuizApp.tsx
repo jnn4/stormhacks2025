@@ -32,17 +32,27 @@ interface QuizProps {
 // Parent Component - Quiz Selection
 function QuizApp(): JSX.Element {
   const [selectedQuiz, setSelectedQuiz] = useState<QuizType | null>(null);
+  const mediaUris = window.__MEDIA_URIS__ || {};
 
   if (selectedQuiz) {
     return <Quiz quizType={selectedQuiz} onBack={() => setSelectedQuiz(null)} />;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+    <div 
+      className="min-h-screen p-8" 
+      style={{ 
+        backgroundImage: `url(${mediaUris.bg_winter})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundColor: '#eff6ff' // fallback color if image doesn't load
+      }}
+    >
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">Code Quiz</h1>
-          <p className="text-gray-600">Choose a quiz type to test your skills</p>
+          <h1 className="text-4xl font-bold text-[#272123] mb-4">Code Quiz</h1>
+          <p className="text-[#272123]">Choose a quiz type to test your skills</p>
         </div>
         
         <div className="grid md:grid-cols-3 gap-6">
@@ -64,7 +74,7 @@ function QuizApp(): JSX.Element {
             title="C++"
             icon={<Code2 className="w-12 h-12" />}
             description="Challenge your C++ programming skills"
-            color="bg-blue-500"
+            color="bg-[#688A9F]"
             onClick={() => setSelectedQuiz('cpp')}
           />
         </div>
@@ -77,7 +87,7 @@ function QuizTypeCard({ title, icon, description, color, onClick }: QuizTypeCard
   return (
     <button
       onClick={onClick}
-      className="bg-white rounded-lg p-8 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
+      className="bg-[#FEFEFE] rounded-lg p-8 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
     >
       <div className={`${color} text-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4`}>
         {icon}
@@ -93,6 +103,9 @@ function Quiz({ quizType, onBack }: QuizProps): JSX.Element {
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
   const [userAnswers, setUserAnswers] = useState<Record<number, string>>({});
   const [showResults, setShowResults] = useState<boolean>(false);
+  
+  // Access media URIs passed from the extension
+  const mediaUris = window.__MEDIA_URIS__ || {};
 
   const quizzes: Record<QuizType, Quiz> = {
     terminal: {
@@ -215,7 +228,16 @@ function Quiz({ quizType, onBack }: QuizProps): JSX.Element {
     const percentage = Math.round((score / total) * 100);
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+      <div 
+        className="min-h-screen p-8" 
+        style={{ 
+          backgroundImage: `url(${mediaUris.bg_winter})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundColor: '#eff6ff' // fallback color if image doesn't load
+        }}
+      >
         <div className="max-w-3xl mx-auto">
           <div className="bg-white rounded-lg shadow-xl p-8">
             <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Quiz Results</h2>
@@ -262,7 +284,7 @@ function Quiz({ quizType, onBack }: QuizProps): JSX.Element {
                   setUserAnswers({});
                   setShowResults(false);
                 }}
-                className="flex-1 bg-blue-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-600 transition-colors"
+                className="flex-1 bg-[#688A9F] text-white py-3 px-6 rounded-lg font-semibold hover:bg-[#497089] transition-colors"
               >
                 Retry Quiz
               </button>
@@ -274,7 +296,16 @@ function Quiz({ quizType, onBack }: QuizProps): JSX.Element {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+    <div 
+      className="min-h-screen p-8" 
+      style={{ 
+        backgroundImage: `url(${mediaUris.bg_winter})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundColor: '#eff6ff' // fallback color if image doesn't load
+      }}
+    >
       <div className="max-w-3xl mx-auto">
         <div className="bg-white rounded-lg shadow-xl p-8">
           <div className="flex justify-between items-center mb-6">
@@ -293,7 +324,7 @@ function Quiz({ quizType, onBack }: QuizProps): JSX.Element {
           <div className="mb-8">
             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-blue-500 transition-all duration-300"
+                className="h-full bg-[#688A9F] transition-all duration-300"
                 style={{ width: `${((currentQuestion + 1) / quiz.questions.length) * 100}%` }}
               />
             </div>
@@ -321,7 +352,7 @@ function Quiz({ quizType, onBack }: QuizProps): JSX.Element {
               />
             </div>
 
-            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+            <div className="bg-[#C7E0FE] border-l-4 border-[#688A9F] p-4 rounded">
               <p className="text-sm text-gray-700">
                 <span className="font-semibold">Hint:</span> {question.hint}
               </p>
@@ -338,7 +369,7 @@ function Quiz({ quizType, onBack }: QuizProps): JSX.Element {
             </button>
             <button
               onClick={handleNext}
-              className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors"
+              className="flex-1 px-6 py-3 bg-[#688A9F] text-white rounded-lg font-semibold hover:bg-[#497089] transition-colors"
             >
               {currentQuestion === quiz.questions.length - 1 ? 'Submit Quiz' : 'Next Question'}
             </button>

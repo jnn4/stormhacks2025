@@ -19,7 +19,7 @@
       },
       {
         "command": "stormhacks.openQuiz",
-        "title": "Open Vim Quiz"
+        "title": "Open Terminal Quiz"
       },
       {
         "command": "stormhacks.login",
