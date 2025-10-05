@@ -1,8 +1,9 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from config import config
-from models import db, User, Post
+from models import db, User, Post, TypingSession
 from auth import auth_bp
+from activity import activity_bp
 
 
 def create_app(config_name='default'):
@@ -38,7 +39,9 @@ def create_app(config_name='default'):
     def health():
         return jsonify({'status': 'healthy'}), 200
 
+    # Register blueprints
     app.register_blueprint(auth_bp)
+    app.register_blueprint(activity_bp)
     
 
     @app.route('/chat', methods=['GET', 'POST'])
