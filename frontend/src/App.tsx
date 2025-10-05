@@ -1,5 +1,5 @@
 import './App.css'
-import TerminalBuddy from './components/TerminalBuddy';
+import TerminalBuddy from '../../extension/src/components/TerminalBuddy';
 
 function App() {
     return(

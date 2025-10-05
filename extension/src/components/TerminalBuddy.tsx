@@ -30,9 +30,7 @@ export default function TerminalBuddy() {
 
   return (
     <div className="max-w-xl mx-auto mt-10 p-6 bg-gray-900 text-white rounded-2xl shadow-lg">
-      <h2 className="text-2xl font-bold mb-4 text-green-400">
-        🧠 Terminal Buddy
-      </h2>
+      <h2 className="text-2xl font-bold mb-4 text-green-400"> Terminal Buddy </h2>
 
       <div className="flex gap-2 mb-4">
         <input
