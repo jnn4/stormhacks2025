@@ -74,7 +74,7 @@ function TerminalBuddyApp() {
           value={command}
           onChange={(e) => setCommand(e.target.value)}
           placeholder="Enter a Linux command (e.g., ls)"
-          style={{ flex: 1, padding: "6px" }}
+          style={{ flex: 1, padding: "6px", color: "black" }}
         />
         <button onClick={handleExplain} disabled={loading}>
           {loading ? "Thinking..." : "Explain"}
