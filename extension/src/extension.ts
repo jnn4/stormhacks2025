@@ -1,5 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
+// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import path from "path";
 import { AuthManager } from './auth';
 import { ActivityTracker } from './activity-tracker';
 
@@ -91,6 +93,31 @@ export function activate(context: vscode.ExtensionContext) {
         })
     );
 }
+
+// function getImagesWebViewContent(
+//   images: Record<string, vscode.Uri>,
+//   panel: vscode.WebviewPanel,
+//   webviewBundle:
+// ) {
+//   return `
+// 	<!DOCTYPE html>
+// 	<html lang="en">
+// 	<body>
+// 		<div id="root"></div>
+
+// 		<script>
+// 			window.images = {
+// 				study_icon: ${JSON.stringify(images)};
+// 			}
+// 		</script>
+
+// 		<script type="module" src="${panel.webview.asWebviewUri(
+//       vscode.Uri.file(context.extensionPath)
+//     )}"></script>
+// 	</body>
+// 	</html>
+// 	`;
+// }
 
 function openQuizPanel(extensionUri: vscode.Uri) {
     // Create and show a new webview panel
