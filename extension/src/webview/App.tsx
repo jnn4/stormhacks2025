@@ -1,12 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
+declare global {
+  interface Window {
+    acquireVsCodeApi?: <T = any>() => {
+      postMessage: (message: T) => void;
+      getState: () => T;
+      setState: (state: T) => void;
+    };
+  }
+}
+
+
 const App: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [messages, setMessages] = useState<{ from: string; text: string }[]>([]);
 
-  useEffect(() => {
-    console.log('App component mounted!');
-  }, []);
+  const sendMessage = async () => {
+    if (!searchTerm.trim()) return;
+
+    setMessages((prev) => [...prev, { from: "You", text: searchTerm }]);
+
+    try {
+      const res = await fetch("http://127.0.0.1:5000/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: searchTerm }),
+      });
+
+      const data = await res.json();
+      setMessages((prev) => [...prev, { from: "Bot", text: data.reply }]);
+    } catch (err) {
+      console.error("Error contacting backend:", err);
+      setMessages((prev) => [...prev, { from: "Bot", text: "Error contacting backend" }]);
+    }
+
+    setSearchTerm("");
+  };
 
   return (
     <div className="min-h-full bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
@@ -109,6 +139,65 @@ const App: React.FC = () => {
                 <span>Number + command (e.g., <kbd className="px-1 py-0.5 text-xs bg-gray-200 dark:bg-gray-700 rounded">5dd</kbd>)</span>
               </li>
             </ul>
+          </div>
+
+          <div
+            style={{
+              marginTop: "16px",
+              padding: "12px",
+              backgroundColor: "#fff",
+              borderRadius: "6px",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+            }}
+          >
+            <h2 style={{ fontSize: "14px", fontWeight: "bold", marginBottom: "6px" }}>
+              Chat with Bot
+            </h2>
+            <div style={{ display: "flex", marginBottom: "8px" }}>
+              <input
+                type="text"
+                placeholder="Type your message..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{
+                  flex: 1,
+                  width: "200px",
+                  padding: "6px",
+                  fontSize: "12px",
+                  borderRadius: "4px",
+                  border: "1px solid gray",
+                }}
+              />
+              <button
+                onClick={sendMessage}
+                style={{
+                  marginLeft: "6px",
+                  padding: "6px 12px",
+                  backgroundColor: "#7c3aed",
+                  color: "#fff",
+                  borderRadius: "4px",
+                  fontSize: "12px",
+                  cursor: "pointer",
+                  border: "none",
+                }}
+              >
+                Send
+              </button>
+            </div>
+            <div
+              style={{
+                maxHeight: "160px",
+                overflowY: "auto",
+                borderTop: "1px solid #ddd",
+                paddingTop: "4px",
+              }}
+            >
+              {messages.map((msg, idx) => (
+                <div key={idx} style={{ fontSize: "12px", marginBottom: "2px" }}>
+                  <strong>{msg.from}:</strong> {msg.text}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

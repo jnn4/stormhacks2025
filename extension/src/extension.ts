@@ -53,11 +53,11 @@ class StormhacksViewProvider implements vscode.WebviewViewProvider {
 		webviewView.webview.html = this._getWebviewContent(webviewView.webview);
 
 		// Handle messages from the webview (for debugging)
-		webviewView.webview.onDidReceiveMessage(
-			message => {
-				console.log('Webview message:', message);
-			}
-		);
+		
+		webviewView.webview.onDidReceiveMessage((message) => {
+			console.log(message);
+		});
+
 	}
 
 	private _getWebviewContent(webview: vscode.Webview): string {
