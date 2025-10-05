@@ -71,7 +71,7 @@ class TypingSession(db.Model):
     ended_at = db.Column(db.DateTime(timezone=True), nullable=True)
     language_tag = db.Column(db.Text, nullable=True)
     source = db.Column(db.Text, nullable=False, default='web')
-    device_id = db.Column(db.Text, unique=True, nullable=True)
+    device_id = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime(timezone=True), nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     

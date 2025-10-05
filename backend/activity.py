@@ -1,8 +1,8 @@
 from flask import jsonify, request, Blueprint
 from auth_utils import token_required
 from models import db, User, TypingSession
-from datetime import datetime, timezone
-from sqlalchemy import func, extract
+from datetime import datetime, timezone, timedelta
+from sqlalchemy import func, case, cast, Date
 
 activity_bp = Blueprint("activity", __name__)
 
@@ -251,11 +251,9 @@ def get_activity_stats(current_user):
     Get activity statistics for the authenticated user
     
     Returns:
-    - Total sessions
-    - Total time spent typing
-    - Average session duration
-    - Sessions by language
-    - Sessions by day/week
+    - Overall daily session over past month - list the date
+    - Total time spent typing for each language
+    - Total time spent for each source
     """
     try:
         # Get the user from database by GitHub ID
@@ -267,79 +265,92 @@ def get_activity_stats(current_user):
                 'message': 'Please authenticate first'
             }), 404
         
-        # Get all completed sessions
-        completed_sessions = TypingSession.query.filter(
-            TypingSession.uid == user.uid,
-            TypingSession.ended_at.isnot(None)
-        ).all()
-        
-        # Calculate statistics
-        total_sessions = len(completed_sessions)
-        
-        if total_sessions == 0:
-            return jsonify({
-                'success': True,
-                'stats': {
-                    'total_sessions': 0,
-                    'total_time_seconds': 0,
-                    'average_duration_seconds': 0,
+        # Get all sessions in the past month, group by date, language, and source
+        now = datetime.now(timezone.utc)
+        month_ago = now - timedelta(days=30)
+
+        # Query sessions in the past month for this user
+        sessions_query = (
+            db.session.query(
+                cast(TypingSession.started_at, Date).label('date'),
+                TypingSession.language_tag,
+                TypingSession.source,
+                func.sum(
+                    case(
+                        (TypingSession.ended_at != None, func.extract('epoch', TypingSession.ended_at) - func.extract('epoch', TypingSession.started_at)),
+                        else_=func.extract('epoch', func.now()) - func.extract('epoch', TypingSession.started_at)
+                    )
+                ).label('total_seconds'),
+                func.count().label('session_count')
+            )
+            .filter(
+                TypingSession.uid == user.uid,
+                TypingSession.started_at >= month_ago
+            )
+            .group_by(
+                cast(TypingSession.started_at, Date),
+                TypingSession.language_tag,
+                TypingSession.source
+            )
+            .order_by(
+                cast(TypingSession.started_at, Date).desc()
+            )
+        )
+
+        # Fetch grouped stats
+        grouped_stats = sessions_query.all()
+
+        # Prepare stats for output - structure by date with totals and breakdowns
+        stats_by_date = {}
+        for row in grouped_stats:
+            date_str = row.date.isoformat()
+            minutes = round(row.total_seconds / 60, 2) if row.total_seconds else 0
+            
+            # Initialize date entry if it doesn't exist
+            if date_str not in stats_by_date:
+                stats_by_date[date_str] = {
+                    'total_time_minutes': 0,
                     'by_language': {},
                     'by_source': {},
-                    'active_sessions': 0
+                    'session_count': 0
                 }
-            }), 200
+            
+            # Add to total time for the date
+            stats_by_date[date_str]['total_time_minutes'] += minutes
+            stats_by_date[date_str]['session_count'] += row.session_count
+            
+            # Add to language breakdown
+            lang = row.language_tag or 'unknown'
+            if lang not in stats_by_date[date_str]['by_language']:
+                stats_by_date[date_str]['by_language'][lang] = 0
+            stats_by_date[date_str]['by_language'][lang] += minutes
+            
+            # Add to source breakdown
+            source = row.source or 'unknown'
+            if source not in stats_by_date[date_str]['by_source']:
+                stats_by_date[date_str]['by_source'][source] = 0
+            stats_by_date[date_str]['by_source'][source] += minutes
         
-        # Calculate total time and durations
-        total_time = sum(
-            (session.ended_at - session.started_at).total_seconds()
-            for session in completed_sessions
-        )
-        
-        average_duration = total_time / total_sessions if total_sessions > 0 else 0
-        
-        # Group by language
-        by_language = {}
-        for session in completed_sessions:
-            lang = session.language_tag or 'unknown'
-            if lang not in by_language:
-                by_language[lang] = {
-                    'count': 0,
-                    'total_time_seconds': 0
-                }
-            by_language[lang]['count'] += 1
-            by_language[lang]['total_time_seconds'] += (
-                session.ended_at - session.started_at
-            ).total_seconds()
-        
-        # Group by source
-        by_source = {}
-        for session in completed_sessions:
-            source = session.source or 'unknown'
-            if source not in by_source:
-                by_source[source] = {
-                    'count': 0,
-                    'total_time_seconds': 0
-                }
-            by_source[source]['count'] += 1
-            by_source[source]['total_time_seconds'] += (
-                session.ended_at - session.started_at
-            ).total_seconds()
-        
-        # Get active sessions count
-        active_sessions = TypingSession.query.filter_by(
-            uid=user.uid,
-            ended_at=None
-        ).count()
+        # Round totals to 2 decimal places
+        for date_str in stats_by_date:
+            stats_by_date[date_str]['total_time_minutes'] = round(
+                stats_by_date[date_str]['total_time_minutes'], 2
+            )
+            # Round language times
+            for lang in stats_by_date[date_str]['by_language']:
+                stats_by_date[date_str]['by_language'][lang] = round(
+                    stats_by_date[date_str]['by_language'][lang], 2
+                )
+            # Round source times
+            for source in stats_by_date[date_str]['by_source']:
+                stats_by_date[date_str]['by_source'][source] = round(
+                    stats_by_date[date_str]['by_source'][source], 2
+                )
         
         return jsonify({
             'success': True,
             'stats': {
-                'total_sessions': total_sessions,
-                'total_time_seconds': total_time,
-                'average_duration_seconds': average_duration,
-                'by_language': by_language,
-                'by_source': by_source,
-                'active_sessions': active_sessions
+                'by_date': stats_by_date    
             }
         }), 200
         
