@@ -301,6 +301,11 @@ class StormhacksViewProvider implements vscode.WebviewViewProvider {
             vscode.Uri.joinPath(this._extensionUri, 'dist', 'sidebar.js')
         );
 
+        // Create URIs for media files
+        const screenshotUri = webview.asWebviewUri(
+            vscode.Uri.joinPath(this._extensionUri, 'dist', 'media', 'Screenshot.png')
+        );
+
         const nonce = getNonce();
 
         return `<!DOCTYPE html>
@@ -328,6 +333,11 @@ class StormhacksViewProvider implements vscode.WebviewViewProvider {
     <script nonce="${nonce}">
         // Acquire VS Code API
         const vscode = acquireVsCodeApi();
+        
+        // Make media URIs available to React
+        window.__MEDIA_URIS__ = {
+            screenshot: '${screenshotUri}'
+        };
         
         // Error handling
         window.addEventListener('error', (e) => {

@@ -4,6 +4,7 @@
 
 const path = require('path');
 const webpack = require('webpack');
+const CopyPlugin = require('copy-webpack-plugin');
 
 //@ts-check
 /** @typedef {import('webpack').Configuration} WebpackConfig **/
@@ -90,6 +91,11 @@ const createWebviewConfig = (entryFile, outputFile) => ({
   plugins: [
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
+    }),
+    new CopyPlugin({
+      patterns: [
+        { from: 'src/media', to: 'media' }
+      ]
     })
   ],
   devtool: 'nosources-source-map',

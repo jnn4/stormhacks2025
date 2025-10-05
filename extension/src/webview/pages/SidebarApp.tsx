@@ -4,6 +4,9 @@ const SidebarApp: React.FC = () => {
   const [messages, setMessages] = useState<Array<{ text: string; isUser: boolean }>>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Access media URIs passed from the extension
+  const mediaUris = window.__MEDIA_URIS__ || {};
 
   const handleLogin = () => {
     vscode.postMessage({ command: 'login' });
@@ -73,6 +76,20 @@ const SidebarApp: React.FC = () => {
               Logout
             </button>
           </div>
+
+          {/* Example: Display screenshot from media folder */}
+          {mediaUris.screenshot && (
+            <div className="mb-4 bg-white dark:bg-gray-800 rounded-lg shadow-md p-3">
+              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Media Example (Screenshot.png)
+              </h4>
+              <img 
+                src={mediaUris.screenshot} 
+                alt="Screenshot" 
+                className="w-full rounded border border-gray-200 dark:border-gray-600"
+              />
+            </div>
+          )}
 
           {/* Chat interface */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-3">
