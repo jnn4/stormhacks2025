@@ -32,6 +32,7 @@ interface QuizProps {
 // Parent Component - Quiz Selection
 function QuizApp(): JSX.Element {
   const [selectedQuiz, setSelectedQuiz] = useState<QuizType | null>(null);
+  const mediaUris = window.__MEDIA_URIS__ || {};
 
   if (selectedQuiz) {
     return <Quiz quizType={selectedQuiz} onBack={() => setSelectedQuiz(null)} />;

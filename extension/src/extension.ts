@@ -119,6 +119,32 @@ function getManPage(webview: vscode.Webview, extensionUri: vscode.Uri): string {
         vscode.Uri.joinPath(extensionUri, 'dist', 'manpage.js')
     );
     
+    // Create URIs for all image assets
+    const bgSudoUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(extensionUri, 'dist', 'assets', 'images', 'bg_sudo.jpg')
+    );
+    const calendarIconUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(extensionUri, 'dist', 'assets', 'images', 'calendar_icon.png')
+    );
+    const catHouseUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(extensionUri, 'dist', 'assets', 'images', 'cat_house.png')
+    );
+    const catTreeUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(extensionUri, 'dist', 'assets', 'images', 'cat_tree.png')
+    );
+    const catUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(extensionUri, 'dist', 'assets', 'images', 'cat.png')
+    );
+    const foodBowlUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(extensionUri, 'dist', 'assets', 'images', 'food_bowl.png')
+    );
+    const postureIconUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(extensionUri, 'dist', 'assets', 'images', 'posture_icon.png')
+    );
+    const tutorIconUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(extensionUri, 'dist', 'assets', 'images', 'tutor_icon.png')
+    );
+    
     const nonce = getNonce();
     
     return `<!DOCTYPE html>
@@ -144,10 +170,22 @@ function getManPage(webview: vscode.Webview, extensionUri: vscode.Uri): string {
 <body>
     <div id="root"></div>
     <script nonce="${nonce}">
+        // Pass media URIs to the webview
+        window.__MEDIA_URIS__ = {
+            bgSudo: '${bgSudoUri}',
+            calendarIcon: '${calendarIconUri}',
+            catHouse: '${catHouseUri}',
+            catTree: '${catTreeUri}',
+            cat: '${catUri}',
+            foodBowl: '${foodBowlUri}',
+            postureIcon: '${postureIconUri}',
+            tutorIcon: '${tutorIconUri}'
+        };
+        
         window.addEventListener('error', (e) => {
             console.error('Webview error:', e.message, e.filename, e.lineno, e.colno);
         });
-        console.log('ManPage webview initializing...');
+        console.log('ManPage webview initializing with media URIs:', window.__MEDIA_URIS__);
     </script>
     <script nonce="${nonce}" src="${scriptUri}"></script>
     <script nonce="${nonce}">
@@ -179,6 +217,32 @@ function getQuizWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri
         vscode.Uri.joinPath(extensionUri, 'dist', 'quiz.js')
     );
 
+    // Create URIs for all image assets
+    const bgSudoUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(extensionUri, 'dist', 'assets', 'images', 'bg_sudo.jpg')
+    );
+    const calendarIconUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(extensionUri, 'dist', 'assets', 'images', 'calendar_icon.png')
+    );
+    const catHouseUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(extensionUri, 'dist', 'assets', 'images', 'cat_house.png')
+    );
+    const catTreeUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(extensionUri, 'dist', 'assets', 'images', 'cat_tree.png')
+    );
+    const catUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(extensionUri, 'dist', 'assets', 'images', 'cat.png')
+    );
+    const foodBowlUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(extensionUri, 'dist', 'assets', 'images', 'food_bowl.png')
+    );
+    const postureIconUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(extensionUri, 'dist', 'assets', 'images', 'posture_icon.png')
+    );
+    const tutorIconUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(extensionUri, 'dist', 'assets', 'images', 'tutor_icon.png')
+    );
+
     // Use a nonce to only allow specific scripts to be run
     const nonce = getNonce();
 
@@ -208,11 +272,23 @@ function getQuizWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri
         // Acquire VS Code API
         const vscode = acquireVsCodeApi();
         
+        // Pass media URIs to the webview
+        window.__MEDIA_URIS__ = {
+            bgSudo: '${bgSudoUri}',
+            calendarIcon: '${calendarIconUri}',
+            catHouse: '${catHouseUri}',
+            catTree: '${catTreeUri}',
+            cat: '${catUri}',
+            foodBowl: '${foodBowlUri}',
+            postureIcon: '${postureIconUri}',
+            tutorIcon: '${tutorIconUri}'
+        };
+        
         // Error handling
         window.addEventListener('error', (e) => {
             console.error('Webview error:', e.message, e.filename, e.lineno, e.colno);
         });
-        console.log('Quiz webview initializing...');
+        console.log('Quiz webview initializing with media URIs:', window.__MEDIA_URIS__);
     </script>
     <script nonce="${nonce}" src="${scriptUri}"></script>
     <script nonce="${nonce}">
@@ -401,6 +477,32 @@ class StormhacksViewProvider implements vscode.WebviewViewProvider {
             vscode.Uri.joinPath(this._extensionUri, 'dist', 'sidebar.js')
         );
 
+        // Create URIs for all image assets
+        const bgSudoUri = webview.asWebviewUri(
+            vscode.Uri.joinPath(this._extensionUri, 'dist', 'assets', 'images', 'bg_sudo.jpg')
+        );
+        const calendarIconUri = webview.asWebviewUri(
+            vscode.Uri.joinPath(this._extensionUri, 'dist', 'assets', 'images', 'calendar_icon.png')
+        );
+        const catHouseUri = webview.asWebviewUri(
+            vscode.Uri.joinPath(this._extensionUri, 'dist', 'assets', 'images', 'cat_house.png')
+        );
+        const catTreeUri = webview.asWebviewUri(
+            vscode.Uri.joinPath(this._extensionUri, 'dist', 'assets', 'images', 'cat_tree.png')
+        );
+        const catUri = webview.asWebviewUri(
+            vscode.Uri.joinPath(this._extensionUri, 'dist', 'assets', 'images', 'cat.png')
+        );
+        const foodBowlUri = webview.asWebviewUri(
+            vscode.Uri.joinPath(this._extensionUri, 'dist', 'assets', 'images', 'food_bowl.png')
+        );
+        const postureIconUri = webview.asWebviewUri(
+            vscode.Uri.joinPath(this._extensionUri, 'dist', 'assets', 'images', 'posture_icon.png')
+        );
+        const tutorIconUri = webview.asWebviewUri(
+            vscode.Uri.joinPath(this._extensionUri, 'dist', 'assets', 'images', 'tutor_icon.png')
+        );
+
         const nonce = getNonce();
 
         return `<!DOCTYPE html>
@@ -426,11 +528,23 @@ class StormhacksViewProvider implements vscode.WebviewViewProvider {
 <body>
     <div id="root"></div>
     <script nonce="${nonce}">
+        // Pass media URIs to the webview
+        window.__MEDIA_URIS__ = {
+            bgSudo: '${bgSudoUri}',
+            calendarIcon: '${calendarIconUri}',
+            catHouse: '${catHouseUri}',
+            catTree: '${catTreeUri}',
+            cat: '${catUri}',
+            foodBowl: '${foodBowlUri}',
+            postureIcon: '${postureIconUri}',
+            tutorIcon: '${tutorIconUri}'
+        };
+        
         // Error handling
         window.addEventListener('error', (e) => {
             console.error('Webview error:', e.message, e.filename, e.lineno, e.colno);
         });
-        console.log('Webview initializing...');
+        console.log('Webview initializing with media URIs:', window.__MEDIA_URIS__);
     </script>
     <script nonce="${nonce}" src="${scriptUri}"></script>
     <script nonce="${nonce}">

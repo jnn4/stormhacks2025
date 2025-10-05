@@ -41,7 +41,14 @@ function StudyBuddyApp() {
 
   return (
     <>
-      <div className="bg-[url('../../assets/images/bg_sudo.jpg')] min-h-screen bg-no-repeat bg-cover flex-grow">
+      <div 
+        className="min-h-screen bg-no-repeat bg-cover flex-grow"
+        style={{
+          backgroundImage: window.__MEDIA_URIS__?.bgSudo 
+            ? `url(${window.__MEDIA_URIS__.bgSudo})` 
+            : 'none'
+        }}
+      >
         <div className="flex justify-center space-x-10 p-10">
           {toggleItems.map((_, index) => (
             <CircleToggle

@@ -1,19 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { API_BASE_URL } from "../config";
-
-// VS Code Webview types
-declare global {
-  interface Window {
-    acquireVsCodeApi?: () => {
-      postMessage: (message: any) => void;
-      getState: () => any;
-      setState: (state: any) => void;
-    };
-  }
-}
-
-// Initialize vscode API once
-const vscode = window.acquireVsCodeApi ? window.acquireVsCodeApi() : undefined;
+import { vscode } from "../utils/vscode-api";
 
 function TerminalBuddyApp() {
   const [command, setCommand] = useState("");
