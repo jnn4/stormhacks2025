@@ -29,36 +29,62 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.commands.executeCommand('stormhacks.stormhacksView.focus');
 		})
 	);
+
+	
 }
 
 class StormhacksViewProvider implements vscode.WebviewViewProvider {
 	public static readonly viewType = 'stormhacks.stormhacksView';
+	private _currentWebview?: vscode.WebviewView;
 
+	
 	constructor(
 		private readonly _extensionUri: vscode.Uri
 	) { }
 
 	public resolveWebviewView(
-		webviewView: vscode.WebviewView,
-		context: vscode.WebviewViewResolveContext,
-		_token: vscode.CancellationToken
-	) {
-		webviewView.webview.options = {
-			enableScripts: true,
-			localResourceRoots: [
-				vscode.Uri.joinPath(this._extensionUri, 'dist')
-			]
-		};
+    webviewView: vscode.WebviewView,
+    context: vscode.WebviewViewResolveContext,
+    _token: vscode.CancellationToken
+) {
+    this._currentWebview = webviewView; // store reference
 
-		webviewView.webview.html = this._getWebviewContent(webviewView.webview);
+    webviewView.webview.options = {
+        enableScripts: true,
+        localResourceRoots: [vscode.Uri.joinPath(this._extensionUri, 'dist')]
+    };
 
-		// Handle messages from the webview (for debugging)
-		
-		webviewView.webview.onDidReceiveMessage((message) => {
-			console.log(message);
-		});
+    webviewView.webview.html = this._getWebviewContent(webviewView.webview);
 
-	}
+    webviewView.webview.onDidReceiveMessage(async (message) => {
+        if (message.type === "userMessage") {
+            try {
+                const res = await fetch("http://127.0.0.1:5000/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: message.text }),
+                });
+
+                const data = await res.json();
+
+                this._currentWebview?.webview.postMessage({
+                    type: "reply",
+                    text: data.reply,
+                });
+            } catch (err) {
+                console.error("Error contacting backend:", err);
+                this._currentWebview?.webview.postMessage({
+                    type: "reply",
+                    text: "Error contacting backend",
+                });
+            }
+        }
+    });
+}
+
+
+
+	
 
 	private _getWebviewContent(webview: vscode.Webview): string {
 		// Get the local path to the webview script

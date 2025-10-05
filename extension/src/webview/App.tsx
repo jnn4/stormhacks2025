@@ -16,27 +16,39 @@ const App: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [messages, setMessages] = useState<{ from: string; text: string }[]>([]);
 
-  const sendMessage = async () => {
+  const sendMessage = () => {
     if (!searchTerm.trim()) return;
+
+    console.log("Message to send:", searchTerm);
 
     setMessages((prev) => [...prev, { from: "You", text: searchTerm }]);
 
-    try {
-      const res = await fetch("http://127.0.0.1:5000/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: searchTerm }),
-      });
-
-      const data = await res.json();
-      setMessages((prev) => [...prev, { from: "Bot", text: data.reply }]);
-    } catch (err) {
-      console.error("Error contacting backend:", err);
-      setMessages((prev) => [...prev, { from: "Bot", text: "Error contacting backend" }]);
-    }
-
+    if (window.acquireVsCodeApi) {
+      const vscode = window.acquireVsCodeApi();
+      console.log("Posting message to extension host:", searchTerm); // <-- debug
+      vscode.postMessage({
+        type: "userMessage",
+        text: searchTerm,
+    });
+}
     setSearchTerm("");
   };
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      console.log("Webview received message:", event.data);
+
+      if (event.data.type === "reply") {
+        setMessages((prev) => [...prev, { from: "Bot", text: event.data.text }]);
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, []);
 
   return (
     <div className="min-h-full bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
