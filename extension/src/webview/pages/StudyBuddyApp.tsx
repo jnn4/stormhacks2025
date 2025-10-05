@@ -12,9 +12,36 @@ function StudyBuddyApp() {
     setSelectedOption(index);
   }
 
+  const introMessage = () => {
+    return (
+      <div className="text-center mx-auto">
+        <h1 className="font-sans font-bold text-3xl text-gray-800">
+          Say Hi to Sudo!
+        </h1>
+        <p className="font-sans text-lg text-gray-800 w-auto">
+          Choose track your study progress, study with a tutor or fix your
+          posture with a reminder
+        </p>
+      </div>
+    );
+  };
+
+  // const trackMessage = () => {
+  //   return (
+  //     <p className="text-center mx-auto font-sans text-base text-gray-800 w-auto">
+  //       Your progress will be based on how much you edit your code in the
+  //       current month
+  //     </p>
+  //   );
+  // };
+
+  const trackMessage = () => {
+    return null;
+  };
+
   return (
     <>
-      <div className="bg-[url('../../assets/images/bg_sudo.jpg')] h-screen bg-no-repeat bg-cover">
+      <div className="bg-[url('../../assets/images/bg_sudo.jpg')] min-h-screen bg-no-repeat bg-cover flex-grow">
         <div className="flex justify-center space-x-10 p-10">
           {toggleItems.map((_, index) => (
             <CircleToggle
@@ -25,15 +52,7 @@ function StudyBuddyApp() {
           ))}
         </div>
 
-        <div>
-          <h1 className="font-sans font-bold text-3xl text-gray-800">
-            Say Hi to Sudo!
-          </h1>
-          <p className="font-sans text-lg text-gray-800 w-3/4">
-            Choose track your study progress, study with a tutor or fix your
-            posture with a reminder
-          </p>
-        </div>
+        {selectedOption == -1 ? introMessage() : trackMessage()}
 
         <div className="flex justify-center p-5">
           {(() => {
@@ -45,7 +64,11 @@ function StudyBuddyApp() {
               case 2:
                 return <PostureView></PostureView>;
               default:
-                return <p>Please choose your options</p>;
+                return (
+                  <p className="font-sans text-lg text-gray-800">
+                    Please choose your options
+                  </p>
+                );
             }
           })()}
         </div>
