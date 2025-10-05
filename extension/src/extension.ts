@@ -131,6 +131,9 @@ function getQuizWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri
 <body>
 	<div id="root"></div>
 	<script nonce="${nonce}">
+		// Acquire VS Code API
+		const vscode = acquireVsCodeApi();
+		
 		// Error handling
 		window.addEventListener('error', (e) => {
 			console.error('Webview error:', e.message, e.filename, e.lineno, e.colno);
@@ -263,6 +266,9 @@ class StormhacksViewProvider implements vscode.WebviewViewProvider {
 <body>
 	<div id="root"></div>
 	<script nonce="${nonce}">
+		// Acquire VS Code API
+		const vscode = acquireVsCodeApi();
+		
 		// Error handling
 		window.addEventListener('error', (e) => {
 			console.error('Webview error:', e.message, e.filename, e.lineno, e.colno);

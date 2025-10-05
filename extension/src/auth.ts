@@ -108,9 +108,8 @@ export class AuthManager {
                             <html>
                                 <body style="font-family: system-ui; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                                     <div style="text-align: center; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                                        <h1 style="color: #10b981; margin: 0;">✓ Authentication Successful!</h1>
+                                        <h1 style="color: #10b981; margin: 0;">Authentication Successful!</h1>
                                         <p style="color: #6b7280; margin-top: 1rem;">You can now close this window and return to VS Code.</p>
-                                        <script>setTimeout(() => window.close(), 2000);</script>
                                     </div>
                                 </body>
                             </html>
@@ -126,7 +125,6 @@ export class AuthManager {
                                 <body>
                                     <h1>Authentication Failed</h1>
                                     <p>No token received from authentication server</p>
-                                    <script>setTimeout(() => window.close(), 3000);</script>
                                 </body>
                             </html>
                         `);
