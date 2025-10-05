@@ -17,7 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(activityTracker);
 
     // Register the webview view provider for sidebar
-    const provider = new StormhacksViewProvider(context.extensionUri, authManager, context);
+    const provider = new StormhacksViewProvider(context.extensionUri, authManager, context, activityTracker);
     
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider(
@@ -306,7 +306,8 @@ class StormhacksViewProvider implements vscode.WebviewViewProvider {
     constructor(
         private readonly _extensionUri: vscode.Uri,
         private readonly _authManager: AuthManager,
-        private readonly _context: vscode.ExtensionContext
+        private readonly _context: vscode.ExtensionContext,
+        private readonly _activityTracker?: ActivityTracker
     ) {}
 
     public resolveWebviewView(
@@ -340,10 +341,12 @@ class StormhacksViewProvider implements vscode.WebviewViewProvider {
                     case 'getAuthStatus':
                         const isAuthenticated = await this._authManager.isAuthenticated();
                         const user = isAuthenticated ? await this._authManager.getCurrentUser() : null;
+                        const isTrackingEnabled = this._activityTracker?.isTrackingEnabled() || false;
                         webviewView.webview.postMessage({
                             command: 'authStatus',
                             isAuthenticated,
-                            user: user?.user
+                            user: user?.user,
+                            isTrackingEnabled
                         });
                         break;
                     case 'login':
@@ -373,6 +376,9 @@ class StormhacksViewProvider implements vscode.WebviewViewProvider {
                                 error: error.message
                             });
                         }
+                        break;
+                    case 'toggleTracking':
+                        await vscode.commands.executeCommand('stormhacks.toggleLogSession');
                         break;
                 }
                 
