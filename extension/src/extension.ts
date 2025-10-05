@@ -264,7 +264,7 @@ class StormhacksViewProvider implements vscode.WebviewViewProvider {
                         console.error('[Stormhacks] error contacting backend', err);
                         await webviewView.webview.postMessage({
                             type: 'reply',
-                            text: 'Error contacting backend',
+                            text: 'Error contacting backend. Make sure the backend is running on port 5000.',
                         });
                     }
                 }

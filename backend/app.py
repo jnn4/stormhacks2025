@@ -1,37 +1,42 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from config import config
-from models import db, User, Post
+from models import db, User, Post, TypingSession
+from auth import auth_bp
+from activity import activity_bp
 import os
 from dotenv import load_dotenv
 from google import genai
 
 load_dotenv()
-app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-api_key = os.getenv("GEMINI_API_KEY")
-client = genai.Client(api_key=api_key)
 
 def create_app(config_name='default'):
     """Application factory"""
     app = Flask(__name__)
-
-    # Load .env variables
-    load_dotenv()
-
-    # Secret key
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-
-    # Database URI from .env
-    app.config['SQLALCHEMY_DATABASE_URI'] = (
-        f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
-        f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
-    )
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    
+    # Load configuration
+    app.config.from_object(config[config_name])
+    
+    # Load Gemini API configuration
+    api_key = os.getenv("GEMINI_API_KEY")
+    
+    # Initialize Gemini client if API key is available
+    client = None
+    if api_key:
+        client = genai.Client(api_key=api_key)
     
     # Initialize extensions
     db.init_app(app)
     CORS(app)
+    
+    # Register blueprints
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(activity_bp)
+    
+    # Create database tables
+    with app.app_context():
+        db.create_all()
+        print("Database tables created successfully!")
     
     # Register routes
     @app.route('/')
@@ -55,44 +60,34 @@ def create_app(config_name='default'):
     def health():
         return jsonify({'status': 'healthy'}), 200
     
-
-    @app.route('/chat', methods=['POST'])
+    @app.route('/chat', methods=['GET', 'POST'])
     def chat():
-        data = request.get_json()  # Get JSON body from POST
-        if not data or "message" not in data:
-            return jsonify({"error": "No message provided"}), 400
-
-        user_message = data["message"]
+        if request.method == 'GET':
+            return jsonify({'message': 'Chat endpoint is ready'})
         
-
         try:
-            # Call Gemini API
+            data = request.get_json()
+            user_message = data.get('message', '')
+            
+            if not user_message:
+                return jsonify({"error": "No message provided"}), 400
+            
+            if not client:
+                return jsonify({"error": "Gemini API not configured"}), 500
+            
+            # Use Gemini to generate response
             response = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=user_message
+                model='gemini-2.0-flash',
+                contents=user_message,
             )
-
-            # Get the text reply
-            reply_text = response.text
-
-            # Optional: log to console
-            print(f"User: {user_message}")
-            print(f"Gemini: {reply_text}")
-
-            return jsonify({"reply": reply_text})
-
+            
+            return jsonify({"reply": response.text})
         except Exception as e:
-            print("Error calling Gemini API:", e)
-            return jsonify({"error": "Failed to generate response"}), 500
-
-
-
-
+            print(f"Error in chat endpoint: {e}")
+            return jsonify({"error": str(e)}), 500
     
     return app
 
-
 if __name__ == '__main__':
-    app = create_app()
-    app.run(host='0.0.0.0', port=5000, debug=True)
-
+    app = create_app('development')
+    app.run(host='127.0.0.1', port=5000, debug=True)

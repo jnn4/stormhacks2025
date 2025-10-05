@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
 const SidebarApp: React.FC = () => {
+<<<<<<< HEAD
   const [messages, setMessages] = useState<Array<{ text: string; isUser: boolean }>>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+=======
+>>>>>>> origin/main
   const handleLogin = () => {
     vscode.postMessage({ command: 'login' });
   };
@@ -13,6 +16,7 @@ const SidebarApp: React.FC = () => {
     vscode.postMessage({ command: 'logout' });
   };
 
+<<<<<<< HEAD
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
 
@@ -52,12 +56,17 @@ const SidebarApp: React.FC = () => {
     return () => {
       window.removeEventListener('message', messageHandler);
     };
+=======
+  useEffect(() => {
+    console.log('SidebarApp component mounted!');
+>>>>>>> origin/main
   }, []);
 
   return (
     <div className="min-h-full bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
       <div className="px-3 py-3">
         <div className="max-w-full">
+<<<<<<< HEAD
           {/* Auth buttons */}
           <div className="flex gap-2 mb-4">
             <button 
@@ -130,6 +139,14 @@ const SidebarApp: React.FC = () => {
             </div>
           </div>
 
+=======
+          <button className="bg-blue-500 text-white p-2 rounded-md" onClick={() => {
+            handleLogin();
+          }}>Login</button>
+          <button className="bg-red-500 text-white p-2 rounded-md" onClick={() => {
+            handleLogout();
+          }}>Logout</button>
+>>>>>>> origin/main
         </div>
       </div>
     </div>
@@ -168,4 +185,9 @@ const CommandCard: React.FC<CommandCardProps> = ({ title, commands }) => {
   );
 };
 
+<<<<<<< HEAD
 export default SidebarApp;
+=======
+export default SidebarApp;
+
+>>>>>>> origin/main

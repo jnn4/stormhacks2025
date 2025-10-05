@@ -7,6 +7,7 @@ Flask + PostgreSQL backend application with Docker support.
 - Python 3.8+
 - Docker and Docker Compose
 - pip (Python package installer)
+  - need to install genai (see later)
 ## Setup Instructions
 
 ### 1. Create a Virtual Environment (Recommended)
