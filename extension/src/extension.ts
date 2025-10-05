@@ -5,6 +5,69 @@ import path from "path";
 import { AuthManager } from './auth';
 import { ActivityTracker } from './activity-tracker';
 
+// Posture reminder state
+class PostureReminderManager {
+    private timer: NodeJS.Timeout | undefined;
+    private minutes: number = 30;
+    private isActive: boolean = false;
+    private provider?: StormhacksViewProvider;
+
+    setProvider(provider: StormhacksViewProvider) {
+        this.provider = provider;
+    }
+
+    start(minutes: number) {
+        this.stop(); // Clear any existing timer
+        this.minutes = minutes;
+        this.isActive = true;
+        this.scheduleReminder();
+    }
+
+    stop() {
+        if (this.timer) {
+            clearTimeout(this.timer);
+            this.timer = undefined;
+        }
+        this.isActive = false;
+    }
+
+    update(minutes: number) {
+        if (this.isActive) {
+            this.minutes = minutes;
+            // Restart timer with new duration
+            this.start(minutes);
+        }
+    }
+
+    private scheduleReminder() {
+        const milliseconds = this.minutes * 60 * 1000;
+        this.timer = setTimeout(() => {
+            this.showPostureReminder();
+        }, milliseconds);
+    }
+
+    private async showPostureReminder() {
+        const action = await vscode.window.showInformationMessage(
+            '⏰ Time to check your posture! Sit up straight and adjust your position.',
+            'Got it!'
+        );
+        
+        if (action === 'Got it!' && this.isActive) {
+            // Schedule the next reminder
+            this.scheduleReminder();
+        }
+    }
+
+    getStatus() {
+        return {
+            isActive: this.isActive,
+            minutes: this.minutes
+        };
+    }
+}
+
+const postureReminderManager = new PostureReminderManager();
+
 // This method is called when your extension is activated
 export function activate(context: vscode.ExtensionContext) {
     console.log('Stormhacks extension is now active!');
@@ -17,7 +80,10 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(activityTracker);
 
     // Register the webview view provider for sidebar
-    const provider = new StormhacksViewProvider(context.extensionUri, authManager, context);
+    const provider = new StormhacksViewProvider(context.extensionUri, authManager, context, activityTracker);
+    
+    // Set the provider for posture reminder manager
+    postureReminderManager.setProvider(provider);
     
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider(
@@ -96,6 +162,36 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('stormhacks.toggleLogSession', async () => {
             await activityTracker.toggle();
+        })
+    );
+
+    // Register posture reminder commands
+    context.subscriptions.push(
+        vscode.commands.registerCommand('stormhacks.startPostureReminder', async () => {
+            const input = await vscode.window.showInputBox({
+                prompt: 'Enter reminder interval in minutes',
+                placeHolder: '30',
+                validateInput: (value) => {
+                    const num = parseInt(value);
+                    if (isNaN(num) || num <= 0) {
+                        return 'Please enter a positive number';
+                    }
+                    return null;
+                }
+            });
+            
+            if (input) {
+                const minutes = parseInt(input);
+                postureReminderManager.start(minutes);
+                vscode.window.showInformationMessage(`Posture reminders started! You'll be reminded every ${minutes} minute(s).`);
+            }
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('stormhacks.stopPostureReminder', () => {
+            postureReminderManager.stop();
+            vscode.window.showInformationMessage('Posture reminders stopped.');
         })
     );
 }
@@ -306,7 +402,8 @@ class StormhacksViewProvider implements vscode.WebviewViewProvider {
     constructor(
         private readonly _extensionUri: vscode.Uri,
         private readonly _authManager: AuthManager,
-        private readonly _context: vscode.ExtensionContext
+        private readonly _context: vscode.ExtensionContext,
+        private readonly _activityTracker?: ActivityTracker
     ) {}
 
     public resolveWebviewView(
@@ -340,10 +437,12 @@ class StormhacksViewProvider implements vscode.WebviewViewProvider {
                     case 'getAuthStatus':
                         const isAuthenticated = await this._authManager.isAuthenticated();
                         const user = isAuthenticated ? await this._authManager.getCurrentUser() : null;
+                        const isTrackingEnabled = this._activityTracker?.isTrackingEnabled() || false;
                         webviewView.webview.postMessage({
                             command: 'authStatus',
                             isAuthenticated,
-                            user: user?.user
+                            user: user?.user,
+                            isTrackingEnabled
                         });
                         break;
                     case 'login':
@@ -373,6 +472,28 @@ class StormhacksViewProvider implements vscode.WebviewViewProvider {
                                 error: error.message
                             });
                         }
+                        break;
+                    case 'toggleTracking':
+                        await vscode.commands.executeCommand('stormhacks.toggleLogSession');
+                        break;
+                    case 'startPostureReminder':
+                        postureReminderManager.start(message.minutes);
+                        vscode.window.showInformationMessage(`Posture reminders started! You'll be reminded every ${message.minutes} minute(s).`);
+                        break;
+                    case 'stopPostureReminder':
+                        postureReminderManager.stop();
+                        vscode.window.showInformationMessage('Posture reminders stopped.');
+                        break;
+                    case 'updatePostureReminder':
+                        postureReminderManager.update(message.minutes);
+                        break;
+                    case 'getPostureStatus':
+                        const postureStatus = postureReminderManager.getStatus();
+                        webviewView.webview.postMessage({
+                            command: 'postureStatus',
+                            isActive: postureStatus.isActive,
+                            minutes: postureStatus.minutes
+                        });
                         break;
                 }
                 

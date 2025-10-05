@@ -63,6 +63,10 @@ export class ActivityTracker {
         return `vscode-${Date.now()}-${Math.random().toString(36).substring(7)}`;
     }
 
+    public isTrackingEnabled(): boolean {
+        return this.isEnabled;
+    }
+
     public async toggle(): Promise<void> {
         if (this.isEnabled) {
             await this.stop();
