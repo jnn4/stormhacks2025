@@ -201,20 +201,6 @@ function getQuizWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri
     </style>
 </head>
 <body>
-<<<<<<< HEAD
-	<div id="root"></div>
-	<script nonce="${nonce}">
-		// Error handling
-		window.addEventListener('error', (e) => {
-			console.error('Webview error:', e.message, e.filename, e.lineno, e.colno);
-		});
-		console.log('Quiz webview initializing...');
-	</script>
-	<script nonce="${nonce}" src="${scriptUri}"></script>
-	<script nonce="${nonce}">
-		console.log('Quiz webview script loaded');
-	</script>5
-=======
     <div id="root"></div>
     <script nonce="${nonce}">
         // Acquire VS Code API
@@ -230,7 +216,6 @@ function getQuizWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri
     <script nonce="${nonce}">
         console.log('Quiz webview script loaded');
     </script>
->>>>>>> origin
 </body>
 </html>`;
 }
@@ -259,24 +244,7 @@ class StormhacksViewProvider implements vscode.WebviewViewProvider {
             localResourceRoots: [vscode.Uri.joinPath(this._extensionUri, 'dist')],
         };
 
-<<<<<<< HEAD
-		// Handle messages from the webview (for debugging)
-		webviewView.webview.onDidReceiveMessage(async (message) => {
-			if (message.type === "explain") {
-				const res = await fetch("http://127.0.0.1:5000/api/terminal/explain", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ command: message.command }),
-				});
-				const data = await res.json();
-				console.log(data);
-				webviewView.webview.postMessage({ type: "explanation", data });
-			}
-		});
-	}
-=======
         webviewView.webview.html = this._getWebviewContent(webviewView.webview);
->>>>>>> origin
 
         // Dispose any previous listener to avoid duplicates / stale handlers
         if (this._messageDisposable) {
@@ -363,6 +331,41 @@ class StormhacksViewProvider implements vscode.WebviewViewProvider {
                         });
                     }
                 }
+
+                // Handle terminal command explanation requests
+                if (message?.type === 'explain') {
+                    try {
+                        console.log('[Stormhacks] explain request for command:', message.command);
+                        const res = await fetch('http://127.0.0.1:5000/api/terminal/explain', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ command: message.command }),
+                        });
+
+                        if (!res.ok) {
+                            const text = await res.text();
+                            console.error('[Stormhacks] terminal explain backend error:', res.status, text);
+                            await webviewView.webview.postMessage({
+                                type: 'explanation',
+                                data: { explanation: `Backend error: ${res.status} - ${text}` },
+                            });
+                            return;
+                        }
+
+                        const data = await res.json();
+                        console.log('[Stormhacks] sending explanation to webview:', data);
+                        await webviewView.webview.postMessage({
+                            type: 'explanation',
+                            data: { explanation: data.explanation },
+                        });
+                    } catch (err) {
+                        console.error('[Stormhacks] error getting explanation from backend', err);
+                        await webviewView.webview.postMessage({
+                            type: 'explanation',
+                            data: { explanation: 'Error contacting backend. Make sure the backend is running on port 5000.' },
+                        });
+                    }
+                }
             },
             undefined,
             this._context.subscriptions
@@ -421,9 +424,6 @@ class StormhacksViewProvider implements vscode.WebviewViewProvider {
 <body>
     <div id="root"></div>
     <script nonce="${nonce}">
-        // Acquire VS Code API
-        const vscode = acquireVsCodeApi();
-        
         // Error handling
         window.addEventListener('error', (e) => {
             console.error('Webview error:', e.message, e.filename, e.lineno, e.colno);
