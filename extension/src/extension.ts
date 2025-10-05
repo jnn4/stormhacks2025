@@ -186,11 +186,18 @@ class StormhacksViewProvider implements vscode.WebviewViewProvider {
 		webviewView.webview.html = this._getWebviewContent(webviewView.webview);
 
 		// Handle messages from the webview (for debugging)
-		webviewView.webview.onDidReceiveMessage(
-			message => {
-				console.log('Webview message:', message);
+		webviewView.webview.onDidReceiveMessage(async (message) => {
+			if (message.type === "explain") {
+				const res = await fetch("http://127.0.0.1:5000/api/terminal/explain", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ command: message.command }),
+				});
+				const data = await res.json();
+				console.log(data);
+				webviewView.webview.postMessage({ type: "explanation", data });
 			}
-		);
+		});
 	}
 
 	private _getWebviewContent(webview: vscode.Webview): string {
