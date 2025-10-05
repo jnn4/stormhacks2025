@@ -4,10 +4,13 @@ from config import config
 from models import db, User, Post
 import os
 from dotenv import load_dotenv
+from google import genai
 
 load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+api_key = os.getenv("GEMINI_API_KEY")
+client = genai.Client(api_key=api_key)
 
 def create_app(config_name='default'):
     """Application factory"""
@@ -55,6 +58,13 @@ def create_app(config_name='default'):
 
     @app.route('/chat', methods=['GET', 'POST'])
     def chat():
+        client = genai.Client()
+
+        response = client.models.generate_content(
+            model="gemini-2.5-flash", contents="Explain how AI works in a few words"
+        )
+        print(response.text)
+        
         if(request.method == 'GET'):
 
             data = "hello world"
