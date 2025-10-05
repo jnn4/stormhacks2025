@@ -31,17 +31,23 @@ export function activate(context: vscode.ExtensionContext) {
         )
     );
 
+	// Register the man page command to open man page in a new tab
+	context.subscriptions.push(
+		vscode.commands.registerCommand('stormhacks.openManPage', () => {
+			openManPagePanel(context.extensionUri);
+		})
+	);
+
+	// Register the quiz command to open quiz in a new tab
+	context.subscriptions.push(
+		vscode.commands.registerCommand('stormhacks.openQuiz', () => {
+			openQuizPanel(context.extensionUri);
+		})
+	);
     // Register the toggle command to focus the sidebar view
     context.subscriptions.push(
         vscode.commands.registerCommand('stormhacks.toggleStormhacks', () => {
             vscode.commands.executeCommand('stormhacks.stormhacksView.focus');
-        })
-    );
-
-    // Register the quiz command to open quiz in a new tab
-    context.subscriptions.push(
-        vscode.commands.registerCommand('stormhacks.openQuiz', () => {
-            openQuizPanel(context.extensionUri);
         })
     );
 
@@ -94,30 +100,62 @@ export function activate(context: vscode.ExtensionContext) {
     );
 }
 
-// function getImagesWebViewContent(
-//   images: Record<string, vscode.Uri>,
-//   panel: vscode.WebviewPanel,
-//   webviewBundle:
-// ) {
-//   return `
-// 	<!DOCTYPE html>
-// 	<html lang="en">
-// 	<body>
-// 		<div id="root"></div>
+function openManPagePanel(extensionUri: vscode.Uri) {
+    const panel = vscode.window.createWebviewPanel(
+        'stormhacksManPage',
+        'Terminal Reference',
+        vscode.ViewColumn.One,
+        {
+            enableScripts: true,
+            localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'dist')]
+        }
+    );
+    
+    panel.webview.html = getManPage(panel.webview, extensionUri);
+}
 
-// 		<script>
-// 			window.images = {
-// 				study_icon: ${JSON.stringify(images)};
-// 			}
-// 		</script>
-
-// 		<script type="module" src="${panel.webview.asWebviewUri(
-//       vscode.Uri.file(context.extensionPath)
-//     )}"></script>
-// 	</body>
-// 	</html>
-// 	`;
-// }
+function getManPage(webview: vscode.Webview, extensionUri: vscode.Uri): string {
+    const scriptUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(extensionUri, 'dist', 'manpage.js')
+    );
+    
+    const nonce = getNonce();
+    
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; img-src ${webview.cspSource} https:; script-src 'nonce-${nonce}'; font-src ${webview.cspSource};">
+    <title>Terminal Reference</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+        #root {
+            width: 100%;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script nonce="${nonce}">
+        window.addEventListener('error', (e) => {
+            console.error('Webview error:', e.message, e.filename, e.lineno, e.colno);
+        });
+        console.log('ManPage webview initializing...');
+    </script>
+    <script nonce="${nonce}" src="${scriptUri}"></script>
+    <script nonce="${nonce}">
+        console.log('ManPage webview script loaded');
+    </script>
+</body>
+</html>`;
+}
 
 function openQuizPanel(extensionUri: vscode.Uri) {
     // Create and show a new webview panel
@@ -295,6 +333,41 @@ class StormhacksViewProvider implements vscode.WebviewViewProvider {
                         });
                     }
                 }
+
+                // Handle terminal command explanation requests
+                if (message?.type === 'explain') {
+                    try {
+                        console.log('[Stormhacks] explain request for command:', message.command);
+                        const res = await fetch('http://127.0.0.1:5000/api/terminal/explain', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ command: message.command }),
+                        });
+
+                        if (!res.ok) {
+                            const text = await res.text();
+                            console.error('[Stormhacks] terminal explain backend error:', res.status, text);
+                            await webviewView.webview.postMessage({
+                                type: 'explanation',
+                                data: { explanation: `Backend error: ${res.status} - ${text}` },
+                            });
+                            return;
+                        }
+
+                        const data = await res.json();
+                        console.log('[Stormhacks] sending explanation to webview:', data);
+                        await webviewView.webview.postMessage({
+                            type: 'explanation',
+                            data: { explanation: data.explanation },
+                        });
+                    } catch (err) {
+                        console.error('[Stormhacks] error getting explanation from backend', err);
+                        await webviewView.webview.postMessage({
+                            type: 'explanation',
+                            data: { explanation: 'Error contacting backend. Make sure the backend is running on port 5000.' },
+                        });
+                    }
+                }
             },
             undefined,
             this._context.subscriptions
@@ -353,9 +426,6 @@ class StormhacksViewProvider implements vscode.WebviewViewProvider {
 <body>
     <div id="root"></div>
     <script nonce="${nonce}">
-        // Acquire VS Code API
-        const vscode = acquireVsCodeApi();
-        
         // Error handling
         window.addEventListener('error', (e) => {
             console.error('Webview error:', e.message, e.filename, e.lineno, e.colno);

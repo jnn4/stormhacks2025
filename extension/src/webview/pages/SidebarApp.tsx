@@ -3,6 +3,10 @@ import StudyBuddyApp from "./StudyBuddyApp";
 import TerminalBuddyApp from "./TerminalBuddyApp";
 
 const SidebarApp: React.FC = () => {
+  useEffect(() => {
+    console.log("SidebarApp component mounted!");
+  }, []);
+
   //App State 1 = Buddy, 2 = Terminal
   const [appState, setAppState] = useState(1);
 
