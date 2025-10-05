@@ -231,6 +231,9 @@ function getManPage(webview: vscode.Webview, extensionUri: vscode.Uri): string {
     const catUri = webview.asWebviewUri(
         vscode.Uri.joinPath(extensionUri, 'dist', 'assets', 'images', 'cat.png')
     );
+    const cat2Uri = webview.asWebviewUri(
+        vscode.Uri.joinPath(extensionUri, 'dist', 'assets', 'images', 'cat_2.png')
+    );
     const foodBowlUri = webview.asWebviewUri(
         vscode.Uri.joinPath(extensionUri, 'dist', 'assets', 'images', 'food_bowl.png')
     );
@@ -273,6 +276,7 @@ function getManPage(webview: vscode.Webview, extensionUri: vscode.Uri): string {
             catHouse: '${catHouseUri}',
             catTree: '${catTreeUri}',
             cat: '${catUri}',
+            cat2: '${cat2Uri}',
             foodBowl: '${foodBowlUri}',
             postureIcon: '${postureIconUri}',
             tutorIcon: '${tutorIconUri}'
@@ -329,6 +333,9 @@ function getQuizWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri
     const catUri = webview.asWebviewUri(
         vscode.Uri.joinPath(extensionUri, 'dist', 'assets', 'images', 'cat.png')
     );
+    const cat2Uri = webview.asWebviewUri(
+        vscode.Uri.joinPath(extensionUri, 'dist', 'assets', 'images', 'cat_2.png')
+    );
     const foodBowlUri = webview.asWebviewUri(
         vscode.Uri.joinPath(extensionUri, 'dist', 'assets', 'images', 'food_bowl.png')
     );
@@ -375,6 +382,7 @@ function getQuizWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri
             catHouse: '${catHouseUri}',
             catTree: '${catTreeUri}',
             cat: '${catUri}',
+            cat2: '${cat2Uri}',
             foodBowl: '${foodBowlUri}',
             postureIcon: '${postureIconUri}',
             tutorIcon: '${tutorIconUri}'
@@ -614,6 +622,9 @@ class StormhacksViewProvider implements vscode.WebviewViewProvider {
         const catUri = webview.asWebviewUri(
             vscode.Uri.joinPath(this._extensionUri, 'dist', 'assets', 'images', 'cat.png')
         );
+        const cat2Uri = webview.asWebviewUri(
+            vscode.Uri.joinPath(this._extensionUri, 'dist', 'assets', 'images', 'cat_2.png')
+        );
         const foodBowlUri = webview.asWebviewUri(
             vscode.Uri.joinPath(this._extensionUri, 'dist', 'assets', 'images', 'food_bowl.png')
         );
@@ -656,6 +667,7 @@ class StormhacksViewProvider implements vscode.WebviewViewProvider {
             catHouse: '${catHouseUri}',
             catTree: '${catTreeUri}',
             cat: '${catUri}',
+            cat2: '${cat2Uri}',
             foodBowl: '${foodBowlUri}',
             postureIcon: '${postureIconUri}',
             tutorIcon: '${tutorIconUri}'

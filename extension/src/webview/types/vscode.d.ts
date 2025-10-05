@@ -48,6 +48,7 @@ interface MediaUris {
   catHouse?: string;
   catTree?: string;
   cat?: string;
+  cat2?: string;
   foodBowl?: string;
   postureIcon?: string;
   tutorIcon?: string;

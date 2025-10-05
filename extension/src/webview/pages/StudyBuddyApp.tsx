@@ -80,6 +80,17 @@ function StudyBuddyApp() {
           })()}
         </div>
 
+        {/* Cat image at the bottom */}
+        <div className="flex justify-center mt-8 pb-8">
+          {window.__MEDIA_URIS__?.cat && (
+            <img 
+              src={window.__MEDIA_URIS__.cat} 
+              alt="Cat" 
+              className="w-32 h-32 object-contain"
+            />
+          )}
+        </div>
+
         {/* <div className="relative bottom-0 top-0">
           <div className="relative bottom-0 left-0 w-10 h-10 rounded-full bg-red-100 border border-yellow-950">
             <p className="absolute bottom-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 font-sans font-bold text-sm text-gray-800">

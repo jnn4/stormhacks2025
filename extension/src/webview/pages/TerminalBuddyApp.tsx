@@ -56,6 +56,17 @@ function TerminalBuddyApp() {
     <div style={{ padding: "12px", fontFamily: "sans-serif", color: "#fff" }}>
       <h1 style={{ marginBottom: "12px" }}>Terminal Buddy</h1>
 
+      {/* Cat 2 image at the top */}
+      <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
+        {window.__MEDIA_URIS__?.cat2 && (
+          <img 
+            src={window.__MEDIA_URIS__.cat2} 
+            alt="Cat 2" 
+            style={{ width: "128px", height: "128px", objectFit: "contain" }}
+          />
+        )}
+      </div>
+
       <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
         <input
           type="text"
