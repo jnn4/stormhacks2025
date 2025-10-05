@@ -30,6 +30,13 @@ export function activate(context: vscode.ExtensionContext) {
 		})
 	);
 
+	// Register the man page command to open man page in a new tab
+	context.subscriptions.push(
+		vscode.commands.registerCommand('stormhacks.openManPage', () => {
+			openManPagePanel(context.extensionUri);
+		})
+	);
+
 	// Register the quiz command to open quiz in a new tab
 	context.subscriptions.push(
 		vscode.commands.registerCommand('stormhacks.openQuiz', () => {
@@ -38,6 +45,63 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 }
 
+function openManPagePanel(extensionUri: vscode.Uri) {
+    const panel = vscode.window.createWebviewPanel(
+        'stormhacksManPage',
+        'Terminal Reference',
+        vscode.ViewColumn.One,
+        {
+            enableScripts: true,
+            localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'dist')]
+        }
+    );
+    
+    panel.webview.html = getManPage(panel.webview, extensionUri);
+}
+
+function getManPage(webview: vscode.Webview, extensionUri: vscode.Uri): string {
+    const scriptUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(extensionUri, 'dist', 'manpage.js')
+    );
+    
+    const nonce = getNonce();
+    
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; img-src ${webview.cspSource} https:; script-src 'nonce-${nonce}'; font-src ${webview.cspSource};">
+    <title>Terminal Reference</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+        #root {
+            width: 100%;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script nonce="${nonce}">
+        window.addEventListener('error', (e) => {
+            console.error('Webview error:', e.message, e.filename, e.lineno, e.colno);
+        });
+        console.log('ManPage webview initializing...');
+    </script>
+    <script nonce="${nonce}" src="${scriptUri}"></script>
+    <script nonce="${nonce}">
+        console.log('ManPage webview script loaded');
+    </script>
+</body>
+</html>`;
+}
+    
 function openQuizPanel(extensionUri: vscode.Uri) {
 	// Create and show a new webview panel
 	const panel = vscode.window.createWebviewPanel(
@@ -95,7 +159,7 @@ function getQuizWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri
 	<script nonce="${nonce}" src="${scriptUri}"></script>
 	<script nonce="${nonce}">
 		console.log('Quiz webview script loaded');
-	</script>
+	</script>5
 </body>
 </html>`;
 }

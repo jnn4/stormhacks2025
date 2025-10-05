@@ -101,5 +101,13 @@ const createWebviewConfig = (entryFile, outputFile) => ({
 // Create webview configurations
 const sidebarWebviewConfig = createWebviewConfig('sidebar.tsx', 'sidebar.js');
 const quizWebviewConfig = createWebviewConfig('quiz.tsx', 'quiz.js');
+const manpageWebviewConfig = createWebviewConfig('manpage.tsx', 'manpage.js');
 
-module.exports = [ extensionConfig, sidebarWebviewConfig, quizWebviewConfig ];
+module.exports = [ extensionConfig, sidebarWebviewConfig, quizWebviewConfig, manpageWebviewConfig ];
+
+module.exports = [ 
+  extensionConfig, 
+  sidebarWebviewConfig, 
+  quizWebviewConfig,
+  manpageWebviewConfig
+];

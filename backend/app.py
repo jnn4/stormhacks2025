@@ -3,7 +3,7 @@ from flask_cors import CORS
 from config import config
 from models import db, User, Post
 from auth import auth_bp
-
+from terminal import terminal_bp
 
 def create_app(config_name='default'):
     """Application factory"""
@@ -48,10 +48,8 @@ def create_app(config_name='default'):
             data = "hello world"
         return jsonify({'data': data})
 
+    app.register_blueprint(terminal_bp)
 
-
-
-    
     return app
 
 

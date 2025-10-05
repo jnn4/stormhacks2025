@@ -1,11 +1,64 @@
 import React, { useState, useEffect } from "react";
+import { API_BASE_URL } from "../config";
 
 function TerminalBuddyApp() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [command, setCommand] = useState("");
+  const [explanation, setExplanation] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    console.log("SidebarApp component mounted!");
+    console.log("TerminalBuddyApp component mounted!");
   }, []);
+
+const handleExplain = async () => {
+    if (!command.trim()) return;
+
+    setLoading(true);
+    setExplanation("");
+
+    try {
+        console.log('Attempting to fetch from:', `${API_BASE_URL}/api/terminal/explain`);
+        console.log('Command:', command);
+
+        const res = await fetch(`${API_BASE_URL}/api/terminal/explain`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({ command }),
+        });
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error('API Error:', {
+                status: res.status,
+                statusText: res.statusText,
+                body: errorText
+            });
+            throw new Error(`API returned ${res.status}: ${errorText}`);
+        }
+
+        const data = await res.json();
+        console.log('API Response:', data);
+
+        if (data.status === 'error') {
+            throw new Error(data.error || 'Unknown error occurred');
+        }
+
+        setExplanation(data.explanation || "No explanation found.");
+    } catch (error: unknown) {
+        console.error('Fetch error:', error);
+        setExplanation(
+            error instanceof Error 
+                ? `Error: ${error.message}`
+                : "An unknown error occurred"
+        );
+    } finally {
+        setLoading(false);
+    }
+};
 
   interface Command {
     key: string;
@@ -46,11 +99,37 @@ function TerminalBuddyApp() {
           {/* Header */}
           <div className="mb-3">
             <h1 className="text-lg font-bold text-gray-800 dark:text-white mb-1">
-              Stormhacks
+              Terminal Buddy
             </h1>
             <p className="text-xs text-gray-600 dark:text-gray-300">
-              Mastering Vim commands
+              Mastering Terminal Commands
             </p>
+          </div>
+
+          {/* Command Explainer Section */}
+          <div className="mb-6 bg-gray-900 p-4 rounded-lg">
+            <div className="flex gap-2 mb-4">
+              <input
+                type="text"
+                value={command}
+                onChange={(e) => setCommand(e.target.value)}
+                placeholder="Enter a Linux command (e.g., ls)"
+                className="flex-1 p-2 rounded bg-gray-800 border border-gray-700 text-white"
+              />
+              <button
+                onClick={handleExplain}
+                className="px-4 py-2 bg-green-600 hover:bg-green-500 rounded text-white"
+                disabled={loading}
+              >
+                {loading ? "Thinking..." : "Explain"}
+              </button>
+            </div>
+
+            {explanation && (
+              <pre className="bg-gray-800 p-4 rounded whitespace-pre-wrap text-sm overflow-y-auto max-h-96 border border-gray-700 text-white">
+                {explanation}
+              </pre>
+            )}
           </div>
 
           {/* Search Bar */}
@@ -58,7 +137,7 @@ function TerminalBuddyApp() {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Search commands..."
+                placeholder="Search command reference..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full px-2 py-1.5 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500"
@@ -82,85 +161,10 @@ function TerminalBuddyApp() {
           </div>
 
           {/* Command Cards */}
-          <div className="space-y-2">
-            <CommandCard
-              title="Navigation"
-              commands={[
-                { key: "h, j, k, l", desc: "Move left, down, up, right" },
-                { key: "w, b", desc: "Move forward/backward by word" },
-                { key: "gg, G", desc: "Go to start/end of file" },
-                { key: "0, $", desc: "Go to start/end of line" },
-              ]}
-            />
-            <CommandCard
-              title="Editing"
-              commands={[
-                { key: "i, a", desc: "Insert before/after cursor" },
-                { key: "o, O", desc: "Open new line below/above" },
-                { key: "d, dd", desc: "Delete (with motion)/line" },
-                { key: "y, yy", desc: "Yank (copy) with motion/line" },
-              ]}
-            />
-            <CommandCard
-              title="Visual Mode"
-              commands={[
-                { key: "v", desc: "Character-wise visual mode" },
-                { key: "V", desc: "Line-wise visual mode" },
-                { key: "Ctrl+v", desc: "Block-wise visual mode" },
-                { key: "gv", desc: "Reselect last visual selection" },
-              ]}
-            />
-            <CommandCard
-              title="Search & Replace"
-              commands={[
-                { key: "/", desc: "Search forward" },
-                { key: "?", desc: "Search backward" },
-                { key: "n, N", desc: "Next/previous search match" },
-                { key: ":%s/old/new/g", desc: "Replace all in file" },
-              ]}
-            />
-          </div>
+          {/* ...existing command cards code... */}
 
           {/* Quick Tips */}
-          <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded shadow">
-            <h2 className="text-sm font-bold text-gray-800 dark:text-white mb-2">
-              Quick Tips
-            </h2>
-            <ul className="space-y-1.5 text-xs text-gray-700 dark:text-gray-300">
-              <li className="flex items-start">
-                <span className="text-purple-500 mr-1.5">•</span>
-                <span>
-                  <kbd className="px-1 py-0.5 text-xs bg-gray-200 dark:bg-gray-700 rounded">
-                    Esc
-                  </kbd>{" "}
-                  to normal mode
-                </span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-purple-500 mr-1.5">•</span>
-                <span>
-                  <kbd className="px-1 py-0.5 text-xs bg-gray-200 dark:bg-gray-700 rounded">
-                    u
-                  </kbd>{" "}
-                  undo,{" "}
-                  <kbd className="px-1 py-0.5 text-xs bg-gray-200 dark:bg-gray-700 rounded">
-                    Ctrl+r
-                  </kbd>{" "}
-                  redo
-                </span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-purple-500 mr-1.5">•</span>
-                <span>
-                  Number + command (e.g.,{" "}
-                  <kbd className="px-1 py-0.5 text-xs bg-gray-200 dark:bg-gray-700 rounded">
-                    5dd
-                  </kbd>
-                  )
-                </span>
-              </li>
-            </ul>
-          </div>
+          {/* ...existing quick tips code... */}
         </div>
       </div>
     </div>
