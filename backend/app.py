@@ -56,19 +56,34 @@ def create_app(config_name='default'):
         return jsonify({'status': 'healthy'}), 200
     
 
-    @app.route('/chat', methods=['GET', 'POST'])
+    @app.route('/chat', methods=['POST'])
     def chat():
-        client = genai.Client()
+        data = request.get_json()  # Get JSON body from POST
+        if not data or "message" not in data:
+            return jsonify({"error": "No message provided"}), 400
 
-        response = client.models.generate_content(
-            model="gemini-2.5-flash", contents="Explain how AI works in a few words"
-        )
-        print(response.text)
+        user_message = data["message"]
         
-        if(request.method == 'GET'):
 
-            data = "hello world"
-        return jsonify({'data': data})
+        try:
+            # Call Gemini API
+            response = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=user_message
+            )
+
+            # Get the text reply
+            reply_text = response.text
+
+            # Optional: log to console
+            print(f"User: {user_message}")
+            print(f"Gemini: {reply_text}")
+
+            return jsonify({"reply": reply_text})
+
+        except Exception as e:
+            print("Error calling Gemini API:", e)
+            return jsonify({"error": "Failed to generate response"}), 500
 
 
 
