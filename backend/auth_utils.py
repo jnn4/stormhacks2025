@@ -6,6 +6,41 @@ from datetime import datetime, timedelta
 from functools import wraps
 from flask import request, jsonify, current_app
 
+import platform
+import subprocess
+
+WINDOWS_EXPLANATIONS = {
+    "ls": "ls - list directory contents",
+    "cd": "cd - change directory",
+    "mkdir": "mkdir - make directory",
+    "rm": "rm - remove files or directories",
+    "pwd": "pwd - print working directory",
+    "touch": "touch - create an empty file or update timestamp",
+}
+
+def get_command_explanation(command: str) -> str:
+    system = platform.system()
+
+    # Windows fallback
+    if system == "Windows":
+        return WINDOWS_EXPLANATIONS.get(command, f"No explanation found for '{command}' on Windows.")
+
+    # Linux/macOS: attempt man page
+    try:
+        result = subprocess.run(
+            ["man", command],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return result.stdout
+    except FileNotFoundError:
+        return f"No 'man' command found on this system."
+    except subprocess.CalledProcessError:
+        return f"No man page found for '{command}'."
+
+
+
 
 def generate_jwt_token(user_data):
     """

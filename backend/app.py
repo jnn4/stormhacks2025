@@ -4,6 +4,7 @@ from config import config
 from models import db, User, Post
 from auth import auth_bp
 from terminal import terminal_bp
+from auth_utils import get_command_explanation
 
 def create_app(config_name='default'):
     """Application factory"""
