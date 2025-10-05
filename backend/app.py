@@ -2,6 +2,7 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from config import config
 from models import db, User, Post
+from routes.terminal_routes import terminal_bp
 
 
 def create_app(config_name='default'):
@@ -35,10 +36,14 @@ def create_app(config_name='default'):
     def health():
         return jsonify({'status': 'healthy'}), 200
     
+    # === Terminal Buddy ===
+    app.register_blueprint(terminal_bp)
+
+    
     return app
 
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)
 
