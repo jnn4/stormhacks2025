@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
+// Declare the VS Code API globally
 declare global {
   interface Window {
     acquireVsCodeApi?: <T = any>() => {
@@ -11,6 +12,10 @@ declare global {
   }
 }
 
+// ✅ Acquire once globally
+const vscode = typeof window !== "undefined" && window.acquireVsCodeApi
+  ? window.acquireVsCodeApi()
+  : undefined;
 
 const App: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -23,31 +28,29 @@ const App: React.FC = () => {
 
     setMessages((prev) => [...prev, { from: "You", text: searchTerm }]);
 
-    if (window.acquireVsCodeApi) {
-      const vscode = window.acquireVsCodeApi();
-      console.log("Posting message to extension host:", searchTerm); // <-- debug
+    // ✅ Reuse the persistent vscode object
+    if (vscode) {
+      console.log("Posting message to extension host:", searchTerm);
       vscode.postMessage({
         type: "userMessage",
         text: searchTerm,
-    });
-}
+      });
+    }
+
     setSearchTerm("");
   };
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      console.log("Webview received message:", event.data);
-
-      if (event.data.type === "reply") {
-        setMessages((prev) => [...prev, { from: "Bot", text: event.data.text }]);
+      const message = event.data;
+      console.log("Webview received:", message);
+      if (message?.type === "reply") {
+        setMessages((prev) => [...prev, { from: "Bot", text: message.text }]);
       }
     };
 
     window.addEventListener("message", handleMessage);
-
-    return () => {
-      window.removeEventListener("message", handleMessage);
-    };
+    return () => window.removeEventListener("message", handleMessage);
   }, []);
 
   return (
