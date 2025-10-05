@@ -70,6 +70,12 @@ export class AuthManager {
     }
 
     public async login(): Promise<boolean> {
+        const token = await this.getToken();
+        if (token) {
+            vscode.window.showInformationMessage(`Already logged in`);
+            return true;
+        }
+        
         return new Promise((resolve, reject) => {
             // Generate a random state for CSRF protection
             const state = crypto.randomBytes(32).toString('hex');

@@ -2,6 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { AuthManager } from './auth';
+import { ActivityTracker } from './activity-tracker';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -11,6 +12,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Initialize the authentication manager
 	const authManager = AuthManager.getInstance(context);
+
+	// Initialize the activity tracker
+	const activityTracker = ActivityTracker.getInstance(context, authManager);
+	context.subscriptions.push(activityTracker);
 
 	// Register the webview view provider for sidebar
 	const provider = new StormhacksViewProvider(context.extensionUri, authManager);
@@ -79,6 +84,13 @@ export function activate(context: vscode.ExtensionContext) {
 			} else {
 				vscode.window.showInformationMessage('Not authenticated. Please login first.');
 			}
+		})
+	);
+
+	// Register activity tracking command
+	context.subscriptions.push(
+		vscode.commands.registerCommand('stormhacks.toggleLogSession', async () => {
+			await activityTracker.toggle();
 		})
 	);
 }

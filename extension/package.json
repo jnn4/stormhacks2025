@@ -32,6 +32,10 @@
       {
         "command": "stormhacks.checkAuth",
         "title": "Stormhacks: Check Authentication Status"
+      },
+      {
+        "command": "stormhacks.toggleLogSession",
+        "title": "Stormhacks: Toggle Activity Logging"
       }
     ],
     "views": {
