@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { API_BASE_URL } from "../config";
 import { vscode } from "../utils/vscode-api";
+import QuizApp from "./QuizApp";
 
 function TerminalBuddyApp() {
   const [command, setCommand] = useState("");
@@ -85,6 +86,8 @@ function TerminalBuddyApp() {
           <p>No explanation yet.</p>
         )}
       </div>
+
+      <QuizApp></QuizApp>
     </div>
   );
 }

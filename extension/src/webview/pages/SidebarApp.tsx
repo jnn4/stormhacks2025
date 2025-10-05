@@ -22,14 +22,14 @@ const SidebarApp: React.FC = () => {
 
   return (
     <div>
-      <div className="relative p-10 bg-white">
+      <div className="relative p-10 ">
         <div className="absolute w-full bottom-0 left-0 h-0.5 border-yellow-950"></div>
         <div
-          className="absolute top-0 left-0 w-1/2 h-full border border-yellow-950"
+          className="bg-white absolute top-0 left-0 w-1/2 h-full border border-yellow-950"
           onClick={handleBuddy}
         ></div>
         <div
-          className="absolute top-0 right-0 w-1/2 h-full border border-yellow-950"
+          className="bg-#222 absolute top-0 right-0 w-1/2 h-full border border-yellow-950"
           onClick={handleTerminal}
         ></div>
       </div>
