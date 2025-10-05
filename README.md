@@ -1,6 +1,6 @@
 # stormhacks2025
 
-## tilda~sudo: Study Buddy + 💻 Terminal Buddy
+## tilda~sudo:
 
 > Your all-in-one companion for learning, coding, and staying productive.
 
