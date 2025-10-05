@@ -40,6 +40,14 @@
             {
                 "command": "stormhacks.toggleLogSession",
                 "title": "Stormhacks: Toggle Activity Logging"
+            },
+            {
+                "command": "stormhacks.startPostureReminder",
+                "title": "Stormhacks: Start Posture Reminder"
+            },
+            {
+                "command": "stormhacks.stopPostureReminder",
+                "title": "Stormhacks: Stop Posture Reminder"
             }
         ],
         "views": {
