@@ -1,5 +1,6 @@
 from flask import jsonify, redirect, request, Blueprint, current_app
 from auth_utils import generate_jwt_token, token_required, token_optional
+from models import db, User
 import requests
 import secrets
 
@@ -18,9 +19,17 @@ def auth_github():
             'message': 'Please set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET in .env'
         }), 500
     
+    # Check if this is from the VS Code extension
+    extension_callback = request.args.get('extension_callback')
+    extension_state = request.args.get('state')
+    
     # Generate random state for CSRF protection
-    state = secrets.token_urlsafe(32)
-    oauth_states[state] = True  # Store state temporarily
+    state = extension_state if extension_state else secrets.token_urlsafe(32)
+    
+    # Store state with optional extension callback URL
+    oauth_states[state] = {
+        'extension_callback': extension_callback
+    } if extension_callback else True
     
     # Build GitHub authorization URL
     github_auth_url = 'https://github.com/login/oauth/authorize'
@@ -54,6 +63,12 @@ def auth_github_callback():
             'error': 'Invalid state parameter',
             'message': 'Possible CSRF attack detected'
         }), 400
+    
+    # Get state data (might contain extension callback)
+    state_data = oauth_states[state]
+    extension_callback = None
+    if isinstance(state_data, dict):
+        extension_callback = state_data.get('extension_callback')
     
     # Remove used state
     del oauth_states[state]
@@ -126,6 +141,34 @@ def auth_github_callback():
                 print(f"Warning: Could not fetch user emails: {email_error}")
                 github_user['email'] = None
         
+        # Create or update user in database
+        user = User.query.filter_by(github_id=github_user['id']).first()
+        
+        if user:
+            # Update existing user
+            user.username = github_user['login']
+            user.email = github_user.get('email')
+            user.name = github_user.get('name')
+            user.avatar_url = github_user.get('avatar_url')
+            user.updated_at = db.func.now()
+        else:
+            # Create new user
+            user = User(
+                github_id=github_user['id'],
+                username=github_user['login'],
+                email=github_user.get('email'),
+                name=github_user.get('name'),
+                avatar_url=github_user.get('avatar_url')
+            )
+            db.session.add(user)
+        
+        try:
+            db.session.commit()
+        except Exception as db_error:
+            db.session.rollback()
+            print(f"Warning: Could not save user to database: {db_error}")
+            # Continue with authentication even if DB save fails
+        
         # Prepare user data for JWT
         user_data = {
             'id': github_user['id'],
@@ -139,13 +182,20 @@ def auth_github_callback():
         # Generate JWT token
         jwt_token = generate_jwt_token(user_data)
         
-        # Return JWT token and user information
+        # If this is from the VS Code extension, redirect to the extension's callback
+        if extension_callback:
+            # Build redirect URL with token
+            redirect_url = f"{extension_callback}?token={jwt_token}&login={user_data['login']}&state={state}"
+            return redirect(redirect_url)
+        
+        # Otherwise, return JSON response for web clients
         return jsonify({
             'success': True,
             'message': 'Successfully authenticated with GitHub',
             'token': jwt_token,
             'user': {
                 'id': user_data['id'],
+                'uid': user.uid if user else None,
                 'login': user_data['login'],
                 'name': user_data['name'],
                 'email': user_data['email'],
