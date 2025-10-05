@@ -33,6 +33,8 @@ def start_typing_session(current_user):
             }), 404
         
         device_id = data.get('device_id') or None
+        new_language_tag = data.get('language_tag')
+        
         # Check if user has an active session (ended_at is NULL)
         active_session = TypingSession.query.filter_by(
             uid=user.uid,
@@ -40,28 +42,41 @@ def start_typing_session(current_user):
             device_id=device_id
         ).first()
         
+        auto_closed_session = None
+        language_switched = False
+        
         if active_session:
-            # Check if the active session is stale (updated_at is more than 5 minutes old)
             current_time = datetime.now(timezone.utc)
             time_since_update = current_time - active_session.updated_at
-            if time_since_update.total_seconds() > 300:  # 5 minutes = 300 seconds
+            
+            # Check if the language has changed
+            if new_language_tag and active_session.language_tag != new_language_tag:
+                # Language switched - close current session and start new one
+                active_session.ended_at = current_time
+                db.session.commit()
+                
+                auto_closed_session = active_session.to_dict()
+                language_switched = True
+                print(f"Language switch detected: {active_session.language_tag or 'none'} -> {new_language_tag}. Closed session {active_session.typing_id}")
+            
+            # Check if the active session is stale (updated_at is more than 5 minutes old)
+            elif time_since_update.total_seconds() > 300:  # 5 minutes = 300 seconds
                 # Auto-close the stale session: set ended_at to updated_at
                 active_session.ended_at = active_session.updated_at
                 db.session.commit()
                 
                 auto_closed_session = active_session.to_dict()
                 print(f"Auto-closed stale session {active_session.typing_id} (inactive for {time_since_update.total_seconds():.0f} seconds)")
+            
+            # Session is active and recent, same language - just update timestamp
             else:
-                active_session.updated_at = datetime.now(timezone.utc)
+                active_session.updated_at = current_time
                 db.session.commit()
-                #return the active session
                 return jsonify({
                     'success': True,
                     'message': 'Session is still active and recent',
                     'session': active_session.to_dict()
                 }), 200
-        else:
-            auto_closed_session = None
         
         # Create new typing session
         new_session = TypingSession(
@@ -84,7 +99,10 @@ def start_typing_session(current_user):
         # Include info about auto-closed session if applicable
         if auto_closed_session:
             response_data['auto_closed_session'] = auto_closed_session
-            response_data['message'] = 'Stale session auto-closed and new session started'
+            if language_switched:
+                response_data['message'] = f'Language switched to {new_language_tag}. Previous session closed and new session started'
+            else:
+                response_data['message'] = 'Stale session auto-closed and new session started'
         
         return jsonify(response_data), 201
         

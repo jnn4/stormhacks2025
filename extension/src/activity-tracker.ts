@@ -217,12 +217,82 @@ export class ActivityTracker {
             return 'unknown';
         }
 
+        // Extension to language mapping for common cases
+        const extensionToLanguage: { [key: string]: string } = {
+            // C/C++
+            'c': 'c',
+            'cc': 'cpp',
+            'cpp': 'cpp',
+            'cxx': 'cpp',
+            'h': 'c',
+            'hpp': 'cpp',
+            'hxx': 'cpp',
+            // Python
+            'py': 'python',
+            'pyw': 'python',
+            'pyi': 'python',
+            // JavaScript/TypeScript
+            'js': 'javascript',
+            'jsx': 'javascriptreact',
+            'ts': 'typescript',
+            'tsx': 'typescriptreact',
+            'mjs': 'javascript',
+            // Web
+            'html': 'html',
+            'htm': 'html',
+            'css': 'css',
+            'scss': 'scss',
+            'sass': 'sass',
+            'less': 'less',
+            // Java
+            'java': 'java',
+            // Go
+            'go': 'go',
+            // Rust
+            'rs': 'rust',
+            // Ruby
+            'rb': 'ruby',
+            // PHP
+            'php': 'php',
+            // Shell
+            'sh': 'shellscript',
+            'bash': 'shellscript',
+            'zsh': 'shellscript',
+            // Other
+            'json': 'json',
+            'xml': 'xml',
+            'yaml': 'yaml',
+            'yml': 'yaml',
+            'md': 'markdown',
+            'sql': 'sql',
+            'swift': 'swift',
+            'kt': 'kotlin',
+            'kts': 'kotlin',
+        };
+
         // Get file extension
         const fileName = document.fileName;
         const extension = fileName.split('.').pop()?.toLowerCase();
         
-        // Return language ID if available, otherwise use extension
-        return document.languageId || extension || 'unknown';
+        // PRIORITY 1: Check our extension mapping FIRST for known file types
+        // This ensures .cc files always map to 'cpp' even if VS Code detects them as 'plaintext'
+        if (extension && extensionToLanguage[extension]) {
+            this.log(`Mapped extension .${extension} to language: ${extensionToLanguage[extension]}`);
+            return extensionToLanguage[extension];
+        }
+        
+        // PRIORITY 2: If extension not in our mapping, use VS Code's languageId (if not plaintext)
+        const languageId = document.languageId;
+        if (languageId && languageId !== 'plaintext') {
+            this.log(`Using VS Code languageId: ${languageId}`);
+            return languageId;
+        }
+        
+        // PRIORITY 3: Final fallback - return the raw extension or 'unknown'
+        const fallback = extension || 'unknown';
+        this.log(`No mapping found, using fallback: ${fallback}`);
+        vscode.window.showInformationMessage(`Fallback is ${fallback}`);
+        return fallback;
     }
 
     private async startSession(): Promise<void> {
