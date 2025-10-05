@@ -53,8 +53,10 @@ function TerminalBuddyApp() {
   };
 
   return (
-    <div style={{ padding: "12px", fontFamily: "sans-serif", color: "#fff" }}>
-      <h1 style={{ marginBottom: "12px" }}>Terminal Buddy</h1>
+    <div style={{ padding: "12px", fontFamily: "sans-serif", color: "#272123", backgroundColor: "#C7E0FE", minHeight: "100vh" }}>
+      <h1 className="font-sans font-bold text-3xl text-[#272123]">
+        Say Hi to Tilda!
+      </h1>
 
       {/* Cat 2 image at the top */}
       <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
@@ -62,7 +64,7 @@ function TerminalBuddyApp() {
           <img 
             src={window.__MEDIA_URIS__.cat2} 
             alt="Cat 2" 
-            style={{ width: "128px", height: "128px", objectFit: "contain" }}
+            style={{ width: "128px", height: "128px", objectFit: "contain", imageRendering: "pixelated" }}
           />
         )}
       </div>
@@ -73,9 +75,28 @@ function TerminalBuddyApp() {
           value={command}
           onChange={(e) => setCommand(e.target.value)}
           placeholder="Enter a Linux command (e.g., ls)"
-          style={{ flex: 1, padding: "6px", color: "black" }}
+          style={{ 
+            flex: 1, 
+            padding: "6px", 
+            color: "#272123", 
+            backgroundColor: "white",
+            border: "2px solid #688A9F",
+            borderRadius: "4px"
+          }}
         />
-        <button onClick={handleExplain} disabled={loading}>
+        <button 
+          onClick={handleExplain} 
+          disabled={loading}
+          style={{
+            backgroundColor: loading ? "#688A9F" : "#272123",
+            color: "white",
+            padding: "6px 12px",
+            border: "none",
+            borderRadius: "4px",
+            cursor: loading ? "not-allowed" : "pointer",
+            opacity: loading ? 0.7 : 1
+          }}
+        >
           {loading ? "Thinking..." : "Explain"}
         </button>
       </div>
@@ -84,7 +105,8 @@ function TerminalBuddyApp() {
         {explanation ? (
           <pre
             style={{
-              background: "#222",
+              background: "#272123",
+              color: "#C7E0FE",
               padding: "8px",
               borderRadius: "4px",
               maxHeight: "300px",
@@ -94,7 +116,7 @@ function TerminalBuddyApp() {
             {explanation}
           </pre>
         ) : (
-          <p>No explanation yet.</p>
+          <p style={{ color: "#688A9F" }}>No explanation yet.</p>
         )}
       </div>
 

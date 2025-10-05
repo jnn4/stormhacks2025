@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Code2, Terminal, FileCode } from 'lucide-react';
 
 type QuizType = 'terminal' | 'vim' | 'cpp';
 
@@ -39,33 +38,33 @@ function QuizApp(): JSX.Element {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+    <div className="min-h-screen p-8" style={{ backgroundColor: '#C7E0FE' }}>
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">Code Quiz</h1>
-          <p className="text-gray-600">Choose a quiz type to test your skills</p>
+          <h1 className="text-4xl font-bold mb-4" style={{ color: '#272123' }}>Code Quiz</h1>
+          <p style={{ color: '#688A9F' }}>Choose a quiz type to test your skills</p>
         </div>
         
         <div className="grid md:grid-cols-3 gap-6">
           <QuizTypeCard
             title="Terminal Commands"
-            icon={<Terminal className="w-12 h-12" />}
+            icon={mediaUris.tutorIcon ? <img src={mediaUris.tutorIcon} alt="Terminal" className="w-12 h-12 pixelated" /> : null}
             description="Test your command line knowledge"
-            color="bg-green-500"
+            color="bg-[#688A9F]"
             onClick={() => setSelectedQuiz('terminal')}
           />
           <QuizTypeCard
             title="Vim Editor"
-            icon={<FileCode className="w-12 h-12" />}
+            icon={mediaUris.tutorIcon ? <img src={mediaUris.tutorIcon} alt="Vim" className="w-12 h-12 pixelated" /> : null}
             description="Master vim commands and shortcuts"
-            color="bg-purple-500"
+            color="bg-[#688A9F]"
             onClick={() => setSelectedQuiz('vim')}
           />
           <QuizTypeCard
             title="C++"
-            icon={<Code2 className="w-12 h-12" />}
+            icon={mediaUris.tutorIcon ? <img src={mediaUris.tutorIcon} alt="C++" className="w-12 h-12 pixelated" /> : null}
             description="Challenge your C++ programming skills"
-            color="bg-blue-500"
+            color="bg-[#688A9F]"
             onClick={() => setSelectedQuiz('cpp')}
           />
         </div>
@@ -83,8 +82,8 @@ function QuizTypeCard({ title, icon, description, color, onClick }: QuizTypeCard
       <div className={`${color} text-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4`}>
         {icon}
       </div>
-      <h3 className="text-xl font-bold text-gray-800 mb-2">{title}</h3>
-      <p className="text-gray-600">{description}</p>
+      <h3 className="text-xl font-bold mb-2" style={{ color: '#272123' }}>{title}</h3>
+      <p style={{ color: '#688A9F' }}>{description}</p>
     </button>
   );
 }
@@ -216,16 +215,16 @@ function Quiz({ quizType, onBack }: QuizProps): JSX.Element {
     const percentage = Math.round((score / total) * 100);
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+      <div className="min-h-screen p-8" style={{ backgroundColor: '#C7E0FE' }}>
         <div className="max-w-3xl mx-auto">
           <div className="bg-white rounded-lg shadow-xl p-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Quiz Results</h2>
+            <h2 className="text-3xl font-bold mb-6 text-center" style={{ color: '#272123' }}>Quiz Results</h2>
             
             <div className="text-center mb-8">
               <div className={`text-6xl font-bold mb-2 ${percentage >= 70 ? 'text-green-500' : percentage >= 50 ? 'text-yellow-500' : 'text-red-500'}`}>
                 {percentage}%
               </div>
-              <p className="text-xl text-gray-600">
+              <p className="text-xl" style={{ color: '#688A9F' }}>
                 {score} out of {total} correct
               </p>
             </div>
@@ -237,8 +236,8 @@ function Quiz({ quizType, onBack }: QuizProps): JSX.Element {
                 
                 return (
                   <div key={q.id} className={`p-4 rounded-lg border-2 ${isCorrect ? 'border-green-300 bg-green-50' : 'border-red-300 bg-red-50'}`}>
-                    <p className="font-semibold text-gray-800 mb-2">{q.question}</p>
-                    <p className="text-sm text-gray-600 mb-2">Code: {q.boilerplate}</p>
+                    <p className="font-semibold mb-2" style={{ color: '#272123' }}>{q.question}</p>
+                    <p className="text-sm mb-2" style={{ color: '#688A9F' }}>Code: {q.boilerplate}</p>
                     <div className="flex items-center gap-4">
                       <span className="text-sm">Your answer: <code className="bg-gray-200 px-2 py-1 rounded">{userAnswer || '(empty)'}</code></span>
                       {!isCorrect && (
@@ -253,7 +252,10 @@ function Quiz({ quizType, onBack }: QuizProps): JSX.Element {
             <div className="flex gap-4">
               <button
                 onClick={onBack}
-                className="flex-1 bg-gray-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-gray-600 transition-colors"
+                className="flex-1 text-white py-3 px-6 rounded-lg font-semibold transition-colors"
+                style={{ backgroundColor: '#688A9F' }}
+                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
               >
                 Back to Quiz Selection
               </button>
@@ -263,7 +265,10 @@ function Quiz({ quizType, onBack }: QuizProps): JSX.Element {
                   setUserAnswers({});
                   setShowResults(false);
                 }}
-                className="flex-1 bg-blue-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-600 transition-colors"
+                className="flex-1 text-white py-3 px-6 rounded-lg font-semibold transition-colors"
+                style={{ backgroundColor: '#272123' }}
+                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
               >
                 Retry Quiz
               </button>
@@ -275,55 +280,57 @@ function Quiz({ quizType, onBack }: QuizProps): JSX.Element {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+    <div className="min-h-screen p-8" style={{ backgroundColor: '#C7E0FE' }}>
       <div className="max-w-3xl mx-auto">
         <div className="bg-white rounded-lg shadow-xl p-8">
           <div className="flex justify-between items-center mb-6">
             <button
               onClick={onBack}
-              className="text-gray-600 hover:text-gray-800 font-semibold"
+              className="font-semibold"
+              style={{ color: '#688A9F' }}
             >
               ← Back
             </button>
-            <h2 className="text-2xl font-bold text-gray-800">{quiz.title}</h2>
-            <span className="text-gray-600 font-semibold">
+            <h2 className="text-2xl font-bold" style={{ color: '#272123' }}>{quiz.title}</h2>
+            <span className="font-semibold" style={{ color: '#688A9F' }}>
               {currentQuestion + 1} / {quiz.questions.length}
             </span>
           </div>
 
           <div className="mb-8">
-            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: '#C7E0FE' }}>
               <div
-                className="h-full bg-blue-500 transition-all duration-300"
-                style={{ width: `${((currentQuestion + 1) / quiz.questions.length) * 100}%` }}
+                className="h-full transition-all duration-300"
+                style={{ width: `${((currentQuestion + 1) / quiz.questions.length) * 100}%`, backgroundColor: '#688A9F' }}
               />
             </div>
           </div>
 
           <div className="mb-8">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">
+            <h3 className="text-xl font-semibold mb-4" style={{ color: '#272123' }}>
               {question.question}
             </h3>
             
-            <div className="bg-gray-900 text-green-400 p-6 rounded-lg font-mono text-lg mb-4">
+            <div className="p-6 rounded-lg font-mono text-lg mb-4" style={{ backgroundColor: '#272123', color: '#C7E0FE' }}>
               {question.boilerplate}
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold mb-2" style={{ color: '#272123' }}>
                 Your Answer:
               </label>
               <input
                 type="text"
                 value={userAnswers[question.id] || ''}
                 onChange={handleAnswerChange}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none font-mono text-lg"
+                className="w-full px-4 py-3 border-2 rounded-lg focus:outline-none font-mono text-lg"
+                style={{ borderColor: '#688A9F', color: '#272123' }}
                 placeholder="Fill in the blank..."
               />
             </div>
 
-            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
-              <p className="text-sm text-gray-700">
+            <div className="border-l-4 p-4 rounded" style={{ backgroundColor: '#C7E0FE', borderColor: '#688A9F' }}>
+              <p className="text-sm" style={{ color: '#272123' }}>
                 <span className="font-semibold">Hint:</span> {question.hint}
               </p>
             </div>
@@ -333,13 +340,19 @@ function Quiz({ quizType, onBack }: QuizProps): JSX.Element {
             <button
               onClick={handlePrevious}
               disabled={currentQuestion === 0}
-              className="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-3 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ backgroundColor: '#688A9F' }}
+              onMouseEnter={(e) => !e.currentTarget.disabled && (e.currentTarget.style.opacity = '0.8')}
+              onMouseLeave={(e) => !e.currentTarget.disabled && (e.currentTarget.style.opacity = '1')}
             >
               Previous
             </button>
             <button
               onClick={handleNext}
-              className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors"
+              className="flex-1 px-6 py-3 text-white rounded-lg font-semibold transition-colors"
+              style={{ backgroundColor: '#272123' }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
             >
               {currentQuestion === quiz.questions.length - 1 ? 'Submit Quiz' : 'Next Question'}
             </button>
