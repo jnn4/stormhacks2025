@@ -19,9 +19,17 @@ def auth_github():
             'message': 'Please set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET in .env'
         }), 500
     
+    # Check if this is from the VS Code extension
+    extension_callback = request.args.get('extension_callback')
+    extension_state = request.args.get('state')
+    
     # Generate random state for CSRF protection
-    state = secrets.token_urlsafe(32)
-    oauth_states[state] = True  # Store state temporarily
+    state = extension_state if extension_state else secrets.token_urlsafe(32)
+    
+    # Store state with optional extension callback URL
+    oauth_states[state] = {
+        'extension_callback': extension_callback
+    } if extension_callback else True
     
     # Build GitHub authorization URL
     github_auth_url = 'https://github.com/login/oauth/authorize'
@@ -55,6 +63,12 @@ def auth_github_callback():
             'error': 'Invalid state parameter',
             'message': 'Possible CSRF attack detected'
         }), 400
+    
+    # Get state data (might contain extension callback)
+    state_data = oauth_states[state]
+    extension_callback = None
+    if isinstance(state_data, dict):
+        extension_callback = state_data.get('extension_callback')
     
     # Remove used state
     del oauth_states[state]
@@ -168,7 +182,13 @@ def auth_github_callback():
         # Generate JWT token
         jwt_token = generate_jwt_token(user_data)
         
-        # Return JWT token and user information
+        # If this is from the VS Code extension, redirect to the extension's callback
+        if extension_callback:
+            # Build redirect URL with token
+            redirect_url = f"{extension_callback}?token={jwt_token}&login={user_data['login']}&state={state}"
+            return redirect(redirect_url)
+        
+        # Otherwise, return JSON response for web clients
         return jsonify({
             'success': True,
             'message': 'Successfully authenticated with GitHub',

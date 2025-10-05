@@ -20,6 +20,18 @@
       {
         "command": "stormhacks.openQuiz",
         "title": "Open Vim Quiz"
+      },
+      {
+        "command": "stormhacks.login",
+        "title": "Stormhacks: Login with GitHub"
+      },
+      {
+        "command": "stormhacks.logout",
+        "title": "Stormhacks: Logout"
+      },
+      {
+        "command": "stormhacks.checkAuth",
+        "title": "Stormhacks: Check Authentication Status"
       }
     ],
     "views": {
@@ -45,6 +57,7 @@
   },
   "dependencies": {
     "lucide-react": "^0.544.0",
+    "polka": "^0.5.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
